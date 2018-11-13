@@ -3,28 +3,75 @@
 //var_dump(get_page_template_slug());
 get_header();
 
+//section about
 $about_img = get_field('about_image');
 
+//section advantages
 $i = 1;
-if( have_rows('les_etapos_repeater') ):
-    while ( have_rows('les_etapos_repeater') ) : the_row();
+if( have_rows('advantages') ):
+    while ( have_rows('advantages') ) : the_row();
 
-            $caption = get_sub_field('etapos_caption');
-            $image   = get_sub_field('etapos_image');
-            $image_url    = $image['url'];
+            $image_short[$i]     = get_sub_field('advantage_image_short');
+            $image_long[$i]      = get_sub_field('advantage_image_long');
+            $description_short  = get_sub_field('advantage_description_short');
+            $description_long   = get_sub_field('advantage_description_long');
 
-            $output .= '<li class="etapos-wrapper-box">';
-
-            $output .= '<img src="'.$image_url.'" alt="stage">';
-            $output .= '<span class="caption">'.$caption.'</span>';
-
-            $output .= '</li>';
+            if ( $i % 2 == 0) {
+                $advantages .= '<div class="advantage-block right">';
+                $advantages .= '<div class="advantage-desc">';
+                $advantages .= '<p class="active">';
+                $advantages .= $description_short;
+                $advantages .= '</p>';
+                $advantages .= '<p class="long-text scrollbar">';
+                $advantages .= $description_long;
+                $advantages .= '</p>';
+                $advantages .= '</div>';
+                $advantages .= '<div class="advantage-img">';
+                $advantages .= '<img class="active" src="' .$image_short[$i]. '" alt="advantage">';
+                $advantages .= '<img src="' .$image_long[$i]. '" alt="advantage">';
+            }
+            else {
+                $advantages .= '<div class="advantage-block">';
+                $advantages .= '<div class="advantage-img">';
+                $advantages .= '<img class="active" src="' .$image_short[$i]. '" alt="advantage">';
+                $advantages .= '<img src="' .$image_long[$i]. '" alt="advantage">';
+                $advantages .= '</div>';
+                $advantages .= '<div class="advantage-desc">';
+                $advantages .= '<p class="active">';
+                $advantages .= $description_short;
+                $advantages .= '</p>';
+                $advantages .= '<p class="long-text scrollbar">';
+                $advantages .= $description_long;
+                $advantages .= '</p>';
+            }
+            $advantages .= '</div>';
+            $advantages .= '</div>';
 
             $i++;
 
     endwhile;
 endif;
-$output .= '</ol>';
+
+//section liders
+if( have_rows('liders') ):
+    while ( have_rows('liders') ) : the_row();
+
+        $fio        = get_sub_field('fio');
+        $position   = get_sub_field('position');
+        $photo      = get_sub_field('photo');
+
+        $liders .= '<div class="col-12 col-md-4 lider">';
+        $liders .= '<div class="img-wrapper" style="background-image: url(' . $photo .');"></div>';
+        $liders .= '<h4>';
+        $liders .= $fio;
+        $liders .= '</h4>';
+        $liders .= '<p>';
+        $liders .= $position;
+        $liders .= '</p>';
+        $liders .= '</div>';
+
+    endwhile;
+endif;
 
 ?>
 
@@ -138,7 +185,7 @@ $output .= '</ol>';
     <section class="about">
         <div class="container">
             <div class="row">
-                <div class="col-12">
+                <div class="col-12 offset">
                     <h2>
                         потребительский кооператив,
                         <br>
@@ -147,12 +194,12 @@ $output .= '</ol>';
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-6 offset">
                     <p>
                         Кредитный потребительский кооператив является некоммерческой организацией, который выполняет социальную миссию, предлагая населению доступные услуги финансовой взаимопомощи. Без волокиты с бумагами и справками в «ПОБЕДЕ» всегда можно сохранить свои сбережения под выгодные проценты или оформить заём на неотложные нужды. Деятельность КПК регулируется Федеральным законом «О кредитной кооперации», а контроль осуществляет Центробанк РФ, являясь мега-регулятором кредитных и некредитных организаций.
                     </p>
                 </div>
-                <div class="col-12 col-md-6 image">
+                <div class="col-12 col-md-5 image">
                     <img src= "<?php echo $about_img; ?>" alt="about">
                 </div>
             </div>
@@ -166,60 +213,7 @@ $output .= '</ol>';
                         <h2 class="title">
                             Что мы знаем о победе?
                         </h2>
-                        <div class="advantage-block">
-                            <div class="advantage-img">
-                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-1.png" alt="advantage">
-                            </div>
-                            <div class="advantage-desc">
-                                <p class="active">
-                                    Страхование ответственности <br> ПК на сумму <span>100</span> млн.р
-                                </p>
-                            </div>
-                        </div>
-                        <div class="advantage-block right">
-                            <div class="advantage-desc">
-                                <p class="active">
-                                    Высокие процентные ставки
-                                </p>
-                            </div>
-                            <div class="advantage-img">
-                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-2.png" alt="advantage">
-                            </div>
-                        </div>
-                        <div class="advantage-block">
-                            <div class="advantage-img">
-                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-3.png" alt="advantage">
-                            </div>
-                            <div class="advantage-desc">
-                                <p class="active">
-                                    Возможность входа клиента в <br> наблюдательный совет
-                                </p>
-                            </div>
-                        </div>
-                        <div class="advantage-block right">
-                            <div class="advantage-desc">
-                                <p class="active">
-                                    Качественный клиентский сервис, <br>
-                                    регулярное проведение социальных акций
-                                </p>
-                            </div>
-                            <div class="advantage-img">
-                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-4.png" alt="advantage">
-                            </div>
-                        </div>
-                        <div class="advantage-block">
-                            <div class="advantage-img">
-                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-5.png" alt="advantage">
-                            </div>
-                            <div class="advantage-desc">
-                                <p class="active">
-                                    Ежегодное общедоступное <br> финансово-отчетное собрание.
-                                </p>
-                                <p class="small-text scrollbar">
-                                    Ежегодное общедоступное финансово-отчетное собрание. На собрании окртывается вся финансовая отчетность, показатели и прочее. Каждому пайщику доступна эта информация.
-                                </p>
-                            </div>
-                        </div>
+                        <?php echo $advantages; ?>
                     </div>
                 </div>
             </div>
@@ -236,33 +230,7 @@ $output .= '</ol>';
             </div>
             <div class="wrapper">
                 <div class="row">
-                    <div class="col-12 col-md-4 lider deputy">
-                        <div class="img-wrapper"></div>
-                        <h4>
-                            Гарифуллина Юлия <br> Валерьевна
-                        </h4>
-                        <p>
-                            заместитель председателя совета
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 lider chairman">
-                        <div class="img-wrapper"></div>
-                        <h4>
-                            Кравченко Константин <br> Валерьевич
-                        </h4>
-                        <p>
-                            председатель совета
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-4 lider manager">
-                        <div class="img-wrapper"></div>
-                        <h4>
-                            Жегалов Олег <br> Александрович
-                        </h4>
-                        <p>
-                            управляющий
-                        </p>
-                    </div>
+                    <?php echo $liders; ?>
                 </div>
             </div>
         </div>
@@ -323,17 +291,34 @@ $output .= '</ol>';
 <?php get_footer(); ?>
 
 <script type="application/javascript">
-    window.addEventListener('load', function () {
+    function setHoverOnAdvantageIcon() {
         $('.advantage-img').hover(
             function() {
-              var img = $( this ).find('img').attr('src').replace( /^\D+/g, '');
-              $(this).find('img').attr('src', '<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-hover-' + img);
+              if ( !$( this ).hasClass('active') ) {
+                $( this ).find('img').toggleClass('active');
+              }
             }, function() {
-              if (  !$( this ).hasClass('active') ) {
-                var img = $(this).find('img').attr('src').replace(/^\D+/g, '');
-                $(this).find('img').attr('src', '<?php echo get_stylesheet_directory_uri(); ?>/img/advantage-icon-' + img);
+              if ( !$( this ).hasClass('active') ) {
+                $( this ).find('img').toggleClass('active');
               }
             }
         )
+    }
+
+    function setClickOnAdvantageIcon() {
+      $('.advantage-img').click(function() {
+        if ( !$( this ).hasClass('active') ) {
+            $( this ).addClass('active');
+            $( this ).parent().find('.advantage-desc p').toggleClass('active');
+        } else {
+            $( this ).removeClass('active');
+            $( this ).parent().find('.advantage-desc p').toggleClass('active');
+        }
+      })
+    }
+
+    $(window).on("load", function() {
+        setHoverOnAdvantageIcon();
+        setClickOnAdvantageIcon();
     })
 </script>
