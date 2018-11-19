@@ -5,7 +5,13 @@
  * Displays all of the head element and everything up until the "site-content" div.
  *
  */
-?><!DOCTYPE html>
+
+$email = get_option('email_options');
+$phone = get_option('phone_options');
+
+?>
+
+<!DOCTYPE html>
 <html <?php language_attributes(); ?> class="no-js">
 <head>
 	<title><?php wp_title(''); ?><?php if(wp_title('', false)) { echo ' :'; } ?> <?php bloginfo('name'); ?></title>
@@ -52,9 +58,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="wrapper">
-                    <a href="mailto:info@победа.онлайн">info@победа.онлайн</a>
+                    <a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a>
                     <span>Телефон горячей линии</span>
-                    <a href="tel://8-800-500-2567">8-800-500-2567</a>
+                    <a href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a>
                 </div>
             </div>
         </div>

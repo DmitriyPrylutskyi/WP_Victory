@@ -3,6 +3,10 @@
  * The template for displaying the footer
  *
  */
+
+$email = get_option('email_options');
+$phone = get_option('phone_options');
+
 ?>
 
 <footer>
@@ -15,9 +19,9 @@
                 </a>
             </div>
             <div class="col-12 col-md-6 contacts">
-                <a href="mailto:info@победа.онлайн">info@победа.онлайн</a>
+                <a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a>
                 <span>Телефон горячей линии</span>
-                <a href="tel://8-800-500-2567">8-800-500-2567</a>
+                <a href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a>
             </div>
         </div>
     </div>

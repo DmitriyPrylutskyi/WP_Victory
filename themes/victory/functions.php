@@ -12,6 +12,7 @@
 // including some required file with shortcodes
 
 require get_template_directory() . '/inc/shortcodes.php';
+require get_template_directory() . '/inc/personal-area.php';
 
 /*------------------------------------*\
 	Theme Support
@@ -128,8 +129,6 @@ function register_html5_menu()
 {
     register_nav_menus(array( // Using array to specify more menus if needed
         'header-menu' => __('Header Menu', 'victory'), // Main Navigation
-        'sidebar-menu' => __('Sidebar Menu', 'victory'), // Sidebar Navigation
-        'extra-menu' => __('Extra Menu', 'victory') // Extra Navigation if needed (duplicate as many as you need!)
     ));
 }
 
@@ -170,54 +169,7 @@ function add_slug_to_body_class($classes)
     return $classes;
 }
 
-// If Dynamic Sidebar Exists
-/*if (function_exists('register_sidebar'))
-{
-    // Define Sidebar Widget Area 1
-    register_sidebar(array(
-        'name' => __('Widget Area 1', 'ledeffect'),
-        'description' => __('Description for this widget-area...', 'ledeffect'),
-        'id' => 'widget-area-1',
-        'before_widget' => '<div id="%1$s" class="%2$s">',
-        'after_widget' => '</div>',
-        'before_title' => '<h3>',
-        'after_title' => '</h3>'
-    ));
 
-    // Define Sidebar Widget Area 2
-    register_sidebar(array(
-        'name' => __('Widget Area 2', 'ledeffect'),
-        'description' => __('Description for this widget-area...', 'ledeffect'),
-        'id' => 'widget-area-2',
-        'before_widget' => '<div id="%1$s" class="%2$s">',
-        'after_widget' => '</div>',
-        'before_title' => '<h3>',
-        'after_title' => '</h3>'
-    ));
-
-    register_sidebar(array(
-        'name' => __('Footer Area 1', 'ledeffect'),
-        'description' => __('Description for this widget-area...', 'ledeffect'),
-        'id' => 'footer-area-1',
-        'before_widget' => '<div id="%1$s" class="%2$s">',
-        'after_widget' => '</div>',
-        'before_title' => '<h3>',
-        'after_title' => '</h3>'
-    ));
-}*/
-
-/*// Pagination for paged posts, Page 1, Page 2, Page 3, with Next and Previous Links, No plugin
-function html5wp_pagination()
-{
-    global $wp_query;
-    $big = 999999999;
-    echo paginate_links(array(
-        'base' => str_replace($big, '%#%', get_pagenum_link($big)),
-        'format' => '?paged=%#%',
-        'current' => max(1, get_query_var('paged')),
-        'total' => $wp_query->max_num_pages
-    ));
-}*/
 
 // Custom View Article link to Post
 function html5_blank_view_article($more)
@@ -243,6 +195,28 @@ function remove_thumbnail_dimensions( $html )
 {
     $html = preg_replace('/(width|height)=\"\d*\"\s/', "", $html);
     return $html;
+}
+
+// Create the Custom Excerpts callback
+function the_excerpt_max_charlength( $string, $charlength ){
+    $charlength++;
+
+    if ( mb_strlen( $string ) > $charlength ) {
+        $subex = mb_substr( $string, 0, $charlength - 3 );
+        $exwords = explode( ' ', $subex );
+        $excut = - ( mb_strlen( $exwords[ count( $exwords ) - 1 ] ) );
+        if ( $excut < 0 ) {
+            $output = mb_substr( $subex, 0, $excut );
+        } else {
+            $output;
+        }
+        $output .= '...';
+
+        return $output;
+
+    } else {
+        return $string;
+    }
 }
 
 /**
@@ -277,7 +251,7 @@ add_filter('widget_text', 'shortcode_unautop'); // Remove <p> tags in Dynamic Si
 add_filter('wp_nav_menu_args', 'my_wp_nav_menu_args'); // Remove surrounding <div> from WP Navigation
 add_filter('the_category', 'remove_category_rel_from_category_list'); // Remove invalid rel attribute
 add_filter('the_excerpt', 'shortcode_unautop'); // Remove auto <p> tags in Excerpt (Manual Excerpts only)
-add_filter('the_excerpt', 'do_shortcode'); // Allows Shortcodes to be executed in Excerpt (Manual Excerpts only)
+add_filter('the_excerpt', 'do_shortcode'); // Allows Shortcodes to be executed in Excerpt (Manual do_shortcodes only)
 add_filter('show_admin_bar', 'remove_admin_bar'); // Remove Admin bar
 add_filter('style_loader_tag', 'html5_style_remove'); // Remove 'text/css' from enqueued stylesheet
 add_filter('post_thumbnail_html', 'remove_thumbnail_dimensions', 10); // Remove width and height dynamic attributes to thumbnails
@@ -290,5 +264,120 @@ add_filter('document_title_parts', function( $parts ){
 
 // Remove Filters
 remove_filter('the_excerpt', 'wpautop'); // Remove <p> tags from Excerpt altogether
+
+
+// Register Custom Post Type
+
+function custom_post_type_review() {
+
+    $labels = array(
+
+        'name'                  => _x( 'Отзывы', 'Post Type General Name', 'victory' ),
+
+        'singular_name'         => _x( 'Отзывы', 'Post Type Singular Name', 'victory' ),
+
+        'menu_name'             => __( 'Отзывы', 'victory' ),
+
+        'name_admin_bar'        => __( 'Отзывы', 'victory' ),
+
+        'archives'              => __( 'Архив Отзывов', 'victory' ),
+
+        'parent_item_colon'     => __( 'Родительский Элемент:', 'victory' ),
+
+        'all_items'             => __( 'Все Отзывы', 'victory' ),
+
+        'add_new_item'          => __( 'Добавить Новый Отзыв', 'victory' ),
+
+        'add_new'               => __( 'Добавить Новый', 'victory' ),
+
+        'new_item'              => __( 'Новый Отзыв', 'victory' ),
+
+        'edit_item'             => __( 'Редактировать Отзыв', 'victory' ),
+
+        'update_item'           => __( 'Обновить Отзыв', 'victory' ),
+
+        'view_item'             => __( 'Посмотреть Отзыв', 'victory' ),
+
+        'search_items'          => __( 'Поиск Отзыва', 'victory' ),
+
+        'not_found'             => __( 'Не Найдено', 'victory' ),
+
+        'not_found_in_trash'    => __( 'Не найдено в корзине', 'victory' ),
+
+        'featured_image'        => __( 'Избранное Изображение', 'victory' ),
+
+        'set_featured_image'    => __( 'Установить Избранное Изображение', 'victory' ),
+
+        'remove_featured_image' => __( 'Удалить Избранное Изображение', 'victory' ),
+
+        'use_featured_image'    => __( 'Использовать как Избранное Изображение', 'victory' ),
+
+        'insert_into_item'      => __( 'Вставить в отзыв', 'victory' ),
+
+        'uploaded_to_this_item' => __( 'Загружено в этот отзыв', 'victory' ),
+
+        'items_list'            => __( 'Список отзывов', 'victory' ),
+
+        'items_list_navigation' => __( 'Управление списком отзывов', 'victory' ),
+
+        'filter_items_list'     => __( 'Филтьр списка отзывов', 'victory' ),
+
+    );
+
+    $args = array(
+
+        'label'                 => __( 'Отзывы', 'victory' ),
+
+        'description'           => __( 'Post Type Description', 'victory' ),
+
+        'labels'                => $labels,
+
+        'supports'              => array( 'title'),
+
+        'hierarchical'          => false,
+
+        'public'                => true,
+
+        'show_ui'               => true,
+
+        'show_in_menu'          => true,
+
+        'menu_position'         => 5,
+
+        'show_in_admin_bar'     => true,
+
+        'show_in_nav_menus'     => true,
+
+        'can_export'            => true,
+
+        'has_archive'           => true,
+
+        'exclude_from_search'   => false,
+
+        'publicly_queryable'    => true,
+
+        'capability_type'       => 'page',
+
+    );
+
+    register_post_type( 'reviews', $args );
+
+}
+
+add_action( 'init', 'custom_post_type_review', 0 );
+
+///////////////////////////////////////////////////////////////////////////////////////////
+/////// If admin create the menu
+///////////////////////////////////////////////////////////////////////////////////////////
+if (is_admin()) {
+    add_action('admin_menu', 'victory_options_admin_menu');
+}
+
+if (!function_exists('victory_options_admin_menu')):
+    function victory_options_admin_menu() {
+        add_options_page('Victory Options', 'Победа Настройки', 8, '/inc/theme-admin.php', 'theme_options_page');
+        require_once get_template_directory().'/inc/theme-admin.php';
+    }
+endif;
 
 ?>

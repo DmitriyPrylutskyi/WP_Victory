@@ -3,6 +3,13 @@
 //var_dump(get_page_template_slug());
 get_header();
 
+//section calc
+$rate_3 = get_option('month_3_rate_options');
+$rate_6 = get_option('month_6_rate_options');
+$rate_12 = get_option('month_12_rate_options');
+$rate_24 = get_option('month_24_rate_options');
+$rate_termless = get_option('termless_rate_options');
+
 //section about
 $about_img = get_field('about_image');
 
@@ -73,6 +80,49 @@ if( have_rows('liders') ):
     endwhile;
 endif;
 
+//section reviews
+extract(shortcode_atts(array(
+    'class' => '',
+    'number' => '1',
+), $atts));
+
+
+// WP_Query arguments
+$args = array(
+    'post_type'              => array( 'reviews' ),
+    'post_status'            => array( 'publish' ),
+    'order'                  => 'DESC',
+    'orderby'                => 'date',
+);
+
+// The Query
+$query = new WP_Query( $args );
+
+// The Loop
+if ( $query->have_posts() ) {
+
+    while ( $query->have_posts() ) {
+        $query->the_post();
+
+        $user_name      = get_the_title();
+        $user_photo     = get_field('photo_review');
+        $location       = get_field('location');
+        $date_review    = (get_field('date_review') == '') ? get_the_date('j F Y') : get_field('date_review');
+        $text_review    = get_field('text_review');
+
+        $reviews .= '<div class="review">';
+        $reviews .= '<div class="photo">';
+        $reviews .= '<img src="' . $user_photo . '" alt="photo">';
+        $reviews .= '</div>';
+        $reviews .= '<h4>' . $user_name . '</h4>';
+        $reviews .= '<span>' . $date_review . '</span>';
+        $reviews .= '<h5>' . $location . '</h5>';
+        $reviews .= '<p>' . the_excerpt_max_charlength($text_review, 220) . '</p>';
+        $reviews .= '</div>';
+
+    }
+}
+
 ?>
 
 <div class="main">
@@ -95,27 +145,27 @@ endif;
                     <div class="data">
                         <form id="calc" action="">
                             <div class="input-period">
-                                <input name="period" type="radio" id="period1" checked>
+                                <input name="period" type="radio" id="period1" value="24" data-rate="<?php echo $rate_24; ?>" checked>
                                 <label for="period1">
                                     <span></span>
                                     2 года
                                 </label>
-                                <input name="period" type="radio" id="period2">
+                                <input name="period" type="radio" id="period2" value="12" data-rate="<?php echo $rate_12; ?>">
                                 <label for="period2">
                                     <span></span>
                                     1 год
                                 </label>
-                                <input name="period" type="radio" id="period3">
+                                <input name="period" type="radio" id="period3" value="6" data-rate="<?php echo $rate_6; ?>">
                                 <label for="period3">
                                     <span></span>
                                     6 месяцев
                                 </label>
-                                <input name="period" type="radio" id="period4">
+                                <input name="period" type="radio" id="period4" value="3" data-rate="<?php echo $rate_3; ?>">
                                 <label for="period4">
                                     <span></span>
                                     3 месяца
                                 </label>
-                                <input name="period" type="radio" id="period5">
+                                <input name="period" type="radio" id="period5" value="1" data-rate="<?php echo $rate_termless; ?>">
                                 <label for="period5">
                                     <span></span>
                                     бессрочное
@@ -160,20 +210,20 @@ endif;
                                 Доход по сбережению
                             </span>
                         <span class="value" id="income" form="calc">
-                                55
+                                2000
                             </span>
                         <span class="caption">
                                 Процентная ставка
                             </span>
                         <span class="value" id="interest-rate" form="calc">
-                                18
+                                <?php echo $rate_24; ?>
                                 <span class="unit">%</span>
                             </span>
                         <span class="caption">
                                 Сумма к концу срока
                             </span>
                         <span class="value" id="total" form="calc">
-                                1055
+                                26000
                             </span>
                         <button type="submit" form="calc">Оставить заявку</button>
                     </div>
@@ -242,42 +292,9 @@ endif;
                     <div class="wrapper-block">
                         <div class="wrapper-carousel">
                             <div class="reviews-carousel">
-                                <div class="review">
-                                    <div class="photo">
-                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/photo.png" alt="photo">
-                                    </div>
-                                    <h4>
-                                        Кравченко Карина Георгиевна
-                                    </h4>
-                                    <span>
-                                        03 мая 2017
-                                    </span>
-                                    <h5>
-                                        г. Мингск
-                                    </h5>
-                                    <p>
-                                        Я являюсь пайщиком КПК "ПЕРВЫЙ", неоднократно обращался за помощью в данную организацию и очень доволен сотрудничеством, планирую обращаться к вам и дальше! Желаю КПК "ПЕРВЫЙ" всего наилучшего и дальнейшего развития! ...
-                                    </p>
-                                </div>
-                                <div class="review">
-                                    <div class="photo">
-                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/img/photo.png" alt="photo">
-                                    </div>
-                                    <h4>
-                                        Кравченко Карина Георгиевна
-                                    </h4>
-                                    <span>
-                                        03 мая 2017
-                                    </span>
-                                    <h5>
-                                        г. Мингск
-                                    </h5>
-                                    <p>
-                                        Я являюсь пайщиком КПК "ПЕРВЫЙ", неоднократно обращался за помощью в данную организацию и очень доволен сотрудничеством, планирую обращаться к вам и дальше! Желаю КПК "ПЕРВЫЙ" всего наилучшего и дальнейшего развития! ...
-                                    </p>
-                                </div>
+                                <?php echo $reviews; ?>
                             </div>
-                            <a href="#" class="link-review">
+                            <a href="/reviews" class="link-review">
                                 Перейти на страницу
                             </a>
                         </div>
