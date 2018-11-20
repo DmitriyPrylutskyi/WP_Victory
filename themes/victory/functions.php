@@ -11,8 +11,8 @@
 
 // including some required file with shortcodes
 
-require get_template_directory() . '/inc/shortcodes.php';
-require get_template_directory() . '/inc/personal-area.php';
+require_once get_template_directory().'/inc/shortcodes.php';
+require_once get_template_directory().'/inc/personal-area.php';
 
 /*------------------------------------*\
 	Theme Support
@@ -84,6 +84,9 @@ function victory_header_scripts()
     	wp_register_script('jquery-ui-touch-punch', get_template_directory_uri() . '/libs/jquery.ui.touch-punch/jquery.ui.touch-punch.min.js', array(), '0.2.3');
         wp_enqueue_script('jquery-ui-touch-punch');
 
+        wp_register_script('popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '1.14.3');
+        wp_enqueue_script('popper');
+
         wp_register_script('bootstrap', get_template_directory_uri().'/libs/bootstrap/bootstrap.min.js', array('jquery-3.3.1'), '4.1.3');
         wp_enqueue_script('bootstrap');
 
@@ -95,6 +98,12 @@ function victory_header_scripts()
 
         wp_register_script('victory-scripts', get_template_directory_uri() . '/js/index.js', array('jquery-3.3.1'), '1.0.0'); // Custom scripts
         wp_enqueue_script('victory-scripts'); // Enqueue it!
+
+        wp_localize_script('victory-scripts', 'vars',
+            array(
+                'admin_url' =>  get_admin_url()
+            )
+        );
 
 //        wp_register_script('google-map-api', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDhXduNu_0Am0oQdy-wPAnSDzibbpaoYzg');
 //        wp_enqueue_script('google-map-api');
@@ -115,6 +124,9 @@ function victory_styles()
 
     wp_register_style('upload', get_template_directory_uri() . '/libs/upload/imageuploadify.min.css', array(), '1.0.0', 'all');
     wp_enqueue_style('upload'); // Enqueue it!
+
+    wp_register_style('fontawesome', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', array(), '5.5.0', 'all');
+    wp_enqueue_style('fontawesome'); // Enqueue it!
 
     wp_register_style('victory', get_template_directory_uri() . '/style.css', array(), '1.0', 'all');
     wp_enqueue_style('victory'); // Enqueue it!
@@ -138,6 +150,18 @@ function my_wp_nav_menu_args($args = '')
     $args['container'] = false;
     return $args;
 }
+
+
+// Add custom attribute and value to a nav menu item's anchor based on CSS class.
+add_filter( 'nav_menu_link_attributes', function ( $atts, $item, $args ) {
+    if ( 'login' === $item->classes[0] ) {
+        $item->post_title = 'Войти';
+        $atts['data-toggle'] = 'modal';
+        $atts['data-target'] = '#enter';
+    }
+
+    return $atts;
+}, 10, 3 );
 
 // Remove Injected classes, ID's and Page ID's from Navigation <li> items
 function my_css_attributes_filter($var)
@@ -379,5 +403,17 @@ if (!function_exists('victory_options_admin_menu')):
         require_once get_template_directory().'/inc/theme-admin.php';
     }
 endif;
+
+function create_onetime_nonce($action = -1) {
+    $time = time();
+    $nonce = wp_create_nonce($time.$action);
+    return $nonce . '-' . $time;
+}
+
+function is_login() {
+    $user = wp_get_current_user();
+
+    return $user->exists();
+}
 
 ?>

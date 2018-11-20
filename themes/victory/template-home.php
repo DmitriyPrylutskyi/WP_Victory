@@ -1,6 +1,6 @@
 <?php
 /* Template Name: Home Template */
-//var_dump(get_page_template_slug());
+
 get_header();
 
 //section calc
@@ -303,8 +303,8 @@ if ( $query->have_posts() ) {
             </div>
         </div>
     </section>
-
 </div>
+
 <?php get_footer(); ?>
 
 <script type="application/javascript">

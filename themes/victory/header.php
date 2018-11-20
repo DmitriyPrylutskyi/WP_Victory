@@ -27,12 +27,6 @@ $phone = get_option('phone_options');
 
 <body <?php body_class(); ?>
 
-<?php
-		$frontpage_id = get_option( 'page_on_front' );
-		$sectionsData = get_post_meta($frontpage_id);
-  	$logo = wp_get_attachment_image($sectionsData['logotype_image'][0], 'full', false, array('alt'=>'Logo', 'class'=>'logo-img'));
-?>
-
 <div class="wrapper">
 
 <nav class="menu">
@@ -66,4 +60,21 @@ $phone = get_option('phone_options');
         </div>
     </div>
 </header>
+
+<?php
+
+    if ( is_login() ) {
+    ?>
+        <script type="application/javascript">
+            $('.main-menu .login a').text('Выйти');
+        </script>
+    <?php
+    } else {
+    ?>
+        <script type="application/javascript">
+            $('.main-menu .login a').text('Войти');
+        </script>
+    <?php
+    }
+?>
 
