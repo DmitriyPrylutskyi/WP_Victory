@@ -1,19 +1,42 @@
 <?php
 /* Template Name: Personal Area Template */
 
-if ( !is_login() ) {
-    wp_redirect( home_url() );
-    exit;
+if ( !is_user_logged_in() ) {
+    wp_redirect(  esc_html( home_url() ) );exit();
 }
 
 get_header();
+
+$current_user           =   wp_get_current_user();
+$userID                 =   $current_user->ID;
+$user_login             =   $current_user->user_login;
+$first_name             =   get_the_author_meta( 'first_name' , $userID );
+$last_name              =   get_the_author_meta( 'last_name' , $userID );
+$patronymic             =   get_the_author_meta( 'patronymic' , $userID );
+$user_email             =   get_the_author_meta( 'user_email' , $userID );
+$user_phone             =   get_the_author_meta( 'phone' , $userID );
+$user_birthday          =   get_the_author_meta( 'birthday' , $userID );
+$user_city              =   get_the_author_meta( 'city' , $userID );
+$gender                 =   get_the_author_meta( 'gender' , $userID );
+$pass_ser               =   get_the_author_meta( 'pass_ser' , $userID );
+$pass_num               =   get_the_author_meta( 'pass_num' , $userID );
+$pass_whom              =   get_the_author_meta( 'pass_whom' , $userID );
+$pass_date              =   get_the_author_meta( 'pass_date' , $userID );
+$pass_code              =   get_the_author_meta( 'pass_code' , $userID );
+$images                 =   unserialize(get_the_author_meta( 'images', $userID ));
+
+// Load upload an thickbox script
+wp_enqueue_script('media-upload');
+wp_enqueue_script('thickbox');
+
+// Load thickbox CSS
+wp_enqueue_style('thickbox');
 
 ?>
 
 <div class="personal-area">
             <div class="oun-head">
                 <h2>Личный кабинет</h2>
-
             </div>
             <div class="contain">
                 <div class="row">
@@ -39,92 +62,92 @@ get_header();
                             <div id="profile" class="tab-pane active">
                                 <div class="personal-info">
                                     <h3 class="new-title">личные данные</h3>
+                                    <div id="personal_info_message"></div>
                                     <div>
                                         <form>
                                             <div class="left-part">
                                                 <div class="one-line">
-                                                    <label for="thir-name" class="can-lable">Фамилия</label>
-                                                    <input type="text" id="thir-name" name="thir-name" placeholder="Фамилия">
+                                                    <label for="last_name" class="can-lable">Фамилия</label>
+                                                    <input type="text" id="last_name" name="last_name" placeholder="Фамилия" value="<?php echo $last_name; ?>">
                                                 </div>
                                                 <div class="one-line">
-                                                    <label for="name" class="can-lable">Имя</label>
-                                                    <input type="text" id="name" name="name" placeholder="Имя">
+                                                    <label for="first_name" class="can-lable">Имя</label>
+                                                    <input type="text" id="first_name" name="first_name" placeholder="Имя" value="<?php echo $first_name; ?>">
                                                 </div>
                                                 <div class="one-line">
-                                                    <label for="fath-nn" class="can-lable">Отчество</label>
-                                                    <input type="text" id="fath-nn" name="fath-nn" placeholder="Отчество">
+                                                    <label for="patronymic" class="can-lable">Отчество</label>
+                                                    <input type="text" id="patronymic" name="patronymic" placeholder="Отчество" value="<?php echo $patronymic; ?>">
                                                 </div>
                                             </div>
                                             <div class="right-part">
                                                 <div class="one-line">
-                                                    <label for="date-b" class="can-lable">Дата рождения</label>
-                                                    <input type="text" id="date-b" name="date-b" placeholder="Дата рождения">
+                                                    <label for="birthday" class="can-lable">Дата рождения</label>
+                                                    <input type="text" id="birthday" name="birthday" placeholder="Дата рождения" value="<?php echo $user_birthday; ?>">
                                                 </div>
                                                 <div class="one-line">
-                                                    <label for="city-of" class="can-lable">Город</label>
-                                                    <input type="text" id="city-of" name="city-of" placeholder="Город">
+                                                    <label for="city" class="can-lable">Город</label>
+                                                    <input type="text" id="city" name="city" placeholder="Город" value="<?php echo $user_city; ?>">
                                                 </div>
                                                 <div class="one-line has-radio">
                                                     <p class="can-lable">Пол</p>
-                                                    <input type="radio" checked id="ma" name="mall">
-                                                    <label for="ma">Мужской</label>
-                                                    <input type="radio" id="wo" name="mall">
-                                                    <label for="wo">Женский</label>
-
+                                                    <input type="radio" id="male" name="gender" <?php if ($gender == 'male' ) { ?>checked="checked"<?php }?> value="male">
+                                                    <label for="male">Мужской</label>
+                                                    <input type="radio" id="female" name="gender" <?php if ($gender == 'female' ) { ?>checked="checked"<?php }?> value="female">
+                                                    <label for="female">Женский</label>
                                                 </div>
                                             </div>
                                             <div class="clean"></div>
                                             <div class="bot-infoo">
                                                 <div class="one-line">
-                                                    <label for="phone-n" class="can-lable">Телефон</label>
-                                                    <input type="text" id="phone-n" name="phone-n" placeholder="Телефон">
+                                                    <label for="user_phone" class="can-lable">Телефон</label>
+                                                    <input type="text" id="user_phone" name="user_phone" placeholder="Телефон" value="<?php echo $user_phone; ?>">
                                                     <a href="">Подтвердить</a>
                                                 </div>
                                                 <div class="one-line">
-                                                    <label for="e-mail" class="can-lable">E-mail</label>
-                                                    <input type="email" id="e-mail" name="e-mail" placeholder="E-mail">
+                                                    <label for="user_email" class="can-lable">E-mail</label>
+                                                    <input type="email" id="user_email" name="user_email" placeholder="E-mail" value="<?php echo $user_email; ?>">
                                                     <a href="">Верифицировать</a>
                                                 </div>
                                             </div>
-                                            <input type="submit" value="Сохранить">
+                                            <input type="hidden" id="security-personal" name="security-personal" value="<?php echo create_onetime_nonce( 'personal_nonce' ); ?>">
+                                            <input type="button" id="user_data" value="Сохранить">
                                             <div class="clean"></div>
                                         </form>
                                     </div>
 
                                 </div>
                                 <div class="pass-data">
-
                                     <h3>
                                         Паспортные ДАННЫЕ
                                     </h3>
-
-
+                                    <div id="passport_info_message"></div>
                                     <form>
                                         <div class="top-sec line-off">
                                             <div class="one-ll">
-                                                <label for="pass-ser" class="can-lable">Серия</label>
-                                                <input type="text" id="pass-ser" name="pass-ser">
+                                                <label for="pass_ser" class="can-lable">Серия</label>
+                                                <input type="text" id="pass_ser" name="pass_ser" value="<?php echo $pass_ser; ?>">
                                             </div>
                                             <div class="one-ll">
-                                                <label for="num-ser" class="can-lable nomm">Номер</label>
-                                                <input type="text" id="num-ser" name="num-ser">
+                                                <label for="pass_num" class="can-lable nomm">Номер</label>
+                                                <input type="text" id="pass_num" name="pass_num" value="<?php echo $pass_num; ?>">
                                             </div>
                                         </div>
                                         <div class="mid-sec line-off">
-                                            <label for="whom-ser" class="can-lable">Кем выдан</label>
-                                            <input type="text" id="whom-ser" name="whom-ser">
+                                            <label for="pass_whom" class="can-lable">Кем выдан</label>
+                                            <input type="text" id="pass_whom" name="pass_whom" value="<?php echo $pass_whom; ?>">
                                         </div>
                                         <div class="bot-sec line-off">
                                             <div class="one-ll">
-                                                <label for="data-ser" class="can-lable">Дата выдачи</label>
-                                                <input type="text" id="data-ser" name="data-ser">
+                                                <label for="pass_date" class="can-lable">Дата выдачи</label>
+                                                <input type="text" id="pass_date" name="pass_date" value="<?php echo $pass_date; ?>">
                                             </div>
                                             <div class="one-ll">
-                                                <label for="kod-ser" class="can-lable nomm">Код подразделения</label>
-                                                <input type="text" id="kod-ser" name="kod-ser">
+                                                <label for="pass_code" class="can-lable nomm">Код подразделения</label>
+                                                <input type="text" id="pass_code" name="pass_code" value="<?php echo $pass_code; ?>">
                                             </div>
                                         </div>
-                                        <input type="submit" value="Сохранить">
+                                        <input type="hidden" id="security-passport" name="security-passport" value="<?php echo create_onetime_nonce( 'passport_nonce' ); ?>">
+                                        <input type="button" id="user_passport" value="Сохранить">
                                         <div class="clean"></div>
                                     </form>
                                 </div>
@@ -136,6 +159,7 @@ get_header();
                                 <div class="last-pass-doc">
                                     <div class="part-l">
                                         <h3>Смена пароля</h3>
+                                        <div id="password_info_message"></div>
                                         <div class="one-sl-bl first-bb">
                                             <label for="old-pass">Старый пароль</label>
                                             <input type="password" id="old-pass" name="old-pass">
@@ -148,21 +172,35 @@ get_header();
                                             <label for="re-pass" class="last-bb">Подтверждение пароля</label>
                                             <input type="password" id="re-pass" name="re-pass">
                                         </div>
-                                        <input type="submit" value="Сохранить">
+                                        <input type="hidden" id="security-password" name="security-password" value="<?php echo create_onetime_nonce( 'password_nonce' ); ?>">
+                                        <input type="button" id="change_password" value="Сохранить">
                                     </div>
                                     <div class="part-r">
                                         <div class="in-nwe-ff">
                                             <h3>Верификация
                                                 пользователя
                                             </h3>
+                                            <div id="doc_info_message"></div>
                                             <p>Загрузите действующий документ, удостоверяющий вашу личность (PNG или JPEG не
                                                 более 5МБ)</p>
-                                            <div>
-                                                <form>
-                                                    <input type="file" accept=".jpg, .jpeg, .png" multiple>
+                                            <div id="user-docs-wrapper">
+                                                <?php if (!empty($images)) :
+                                                    foreach($images as $image): ?>
+                                                    <div class="image-doc-wrapper">
+                                                        <img class="user-preview-image" src="<?php echo $image; ?>">
+                                                        <button type="button" class="btn btn-danger glyphicon glyphicon-remove"><i class="fas fa-times"></i></button>
+                                                    </div>
+                                                <?php
+                                                    endforeach;
+                                                    endif;
+                                                ?>
+                                                <form id="user_docs">
+                                                    <input type="hidden" name="image" id="image" value="" class="regular-text" />
+                                                    <button type="button" class="btn btn-default image_doc"><i class="fas fa-plus"></i></button>
+                                                    <input type="hidden" id="security-doc" name="security-doc" value="<?php echo create_onetime_nonce( 'doc_nonce' ); ?>">
                                                 </form>
                                             </div>
-                                            <input type="submit" value="Сохранить">
+                                            <input type="button" id="uploader_doc" value="Сохранить">
                                         </div>
                                     </div>
                                     <div class="clean"></div>
@@ -438,6 +476,32 @@ get_header();
 
 <script>
     $(document).ready(function () {
-        $('input[type="file"]').imageuploadify();
-    })
+        $( '.image_doc' ).on( 'click', function(e) {
+            e.preventDefault();
+
+            tb_show('Добавить документ', '/wp-admin/media-upload.php?type=image&amp&TB_iframe=1');
+
+            var oldFunc = window.send_to_editor;
+
+            window.send_to_editor = function( html )
+            {
+                imgurl = $( html  ).attr( 'src' );
+                $( '#image' ).val(imgurl);
+                tb_remove();
+                $('#user-docs-wrapper').prepend('<div class="image-doc-wrapper"><img class="user-preview-image" src="' + imgurl + '"><button type="button" class="btn btn-danger glyphicon glyphicon-remove"><i class="fas fa-times"></i></button></div>');
+                window.send_to_editor = oldFunc;
+            }
+
+            return false;
+        });
+
+        $( '#user-docs-wrapper .btn-danger' ).on( 'click', function(e) {
+            $(this).parent('.image-doc-wrapper').remove();
+        });
+
+        $('a[href$="profile"').click(function() {
+            $('#personal_info_message').empty();
+            $('#passport_info_message').empty();
+        });
+    });
 </script>

@@ -93,8 +93,6 @@ function victory_header_scripts()
         wp_register_script('slickscripts', get_template_directory_uri() . '/libs/slick/slick.min.js', array('jquery-3.3.1'), '1.8.0'); // Slick scripts
         wp_enqueue_script('slickscripts');
 
-        wp_register_script('upload', get_template_directory_uri() . '/libs/upload/imageuploadify.min.js', array('jquery-3.3.1'), '1.0.0'); // Upload
-        wp_enqueue_script('upload');
 
         wp_register_script('victory-scripts', get_template_directory_uri() . '/js/index.js', array('jquery-3.3.1'), '1.0.0'); // Custom scripts
         wp_enqueue_script('victory-scripts'); // Enqueue it!
@@ -121,9 +119,6 @@ function victory_styles()
 
     wp_register_style('slick', get_template_directory_uri() . '/libs/slick/slick.css', array(), '1.8.0', 'all');
     wp_enqueue_style('slick'); // Enqueue it!
-
-    wp_register_style('upload', get_template_directory_uri() . '/libs/upload/imageuploadify.min.css', array(), '1.0.0', 'all');
-    wp_enqueue_style('upload'); // Enqueue it!
 
     wp_register_style('fontawesome', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', array(), '5.5.0', 'all');
     wp_enqueue_style('fontawesome'); // Enqueue it!
@@ -221,6 +216,14 @@ function remove_thumbnail_dimensions( $html )
     return $html;
 }
 
+function enqueue_admin()
+{
+    wp_enqueue_script('thickbox');
+    wp_enqueue_style('thickbox');
+
+    wp_enqueue_script('media-upload');
+}
+
 // Create the Custom Excerpts callback
 function the_excerpt_max_charlength( $string, $charlength ){
     $charlength++;
@@ -243,6 +246,175 @@ function the_excerpt_max_charlength( $string, $charlength ){
     }
 }
 
+if( !function_exists('victory_go_home') ):
+    function victory_go_home(){
+        wp_redirect( esc_html( home_url() ) );
+        exit();
+    }
+endif;
+
+if( !function_exists('auto_login_new_user') ):
+    function auto_login_new_user( $user_id ) {
+        wp_set_auth_cookie($user_id);
+        $user = get_user_by( 'id', $user_id );
+        do_action( 'wp_login', $user->user_login, $user );
+        wp_set_current_user($user_id);
+    }
+endif;
+
+if( !function_exists('admin_color_scheme') ):
+    function admin_color_scheme() {
+       global $_wp_admin_css_colors;
+       $_wp_admin_css_colors = [];
+    }
+endif;
+
+function remove_personal_options() {
+     echo '<script type="text/javascript">jQuery(document).ready(function($) {
+$(\'form#your-profile tr.user-admin-bar-front-wrap\').remove(); // remove the "Toolbar" field
+$(\'table.form-table tr.user-url-wrap\').remove();// remove the "Website" field in the "Contact Info" section
+$(\'h2:contains("Обо мне")\').remove(); // remove the "About Yourself" titles
+$(\'form#your-profile tr.user-description-wrap\').remove(); // remove the "Biographical Info" field
+$(\'form#your-profile tr.user-profile-picture\').remove(); // remove the "Profile Picture" field
+});</script>';
+
+}
+
+function show_extra_profile_fields( $user ) {
+    $gender = get_the_author_meta( 'gender', $user->ID );
+    ?>
+    <table class="form-table">
+        <tbody>
+        <tr class="user-gender-wrap">
+            <th>
+                <label class="label">Пол</label>
+            </th>
+            <td>
+                <label class="radio"><input type="radio" id="male" name="gender"  <?php if ($gender == 'male' ) { ?>checked="checked"<?php }?> value="male">Мужской</label>
+                <label class="radio"><input type="radio" id="female" name="gender"  <?php if ($gender == 'female' ) { ?>checked="checked"<?php }?> value="female">Женский</label>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+ <?php }
+
+function save_extra_profile_fields( $user_id ) {
+    update_user_meta( $user_id, 'gender', $_POST['gender'] );
+}
+
+function additional_user_fields( $user ) {
+    ?>
+    <h3>Документы пользователя</h3>
+
+    <table class="form-table">
+
+        <tr>
+            <th>
+                <label>Загрузите документ</label>
+            </th>
+        </tr>
+            <?php
+                $images = get_the_author_meta( 'images', $user->ID );
+                if( $images == "" ) {
+                   $images = [];
+                } else {
+                   $images = unserialize($images);
+                }
+                    foreach($images as $image) :?>
+                        <tr class="image-row" >
+                            <th>
+                                <?php if ($image) : ?>
+                                    <img class="user-preview-image" style="width: auto; height: 100px;" src="<?php echo $image; ?>;">
+                                 <?php
+                                    endif;
+                                ?>
+                            </th>
+                            <td>
+                                <input type="text" name="image" class="user-doc-image regular-text" value="<?php echo $image; ?>" class="regular-text" />
+                                <input type='button' class="button-primary uploadimage" value="Upload Image" />
+                                <input type='button' class="button-secondary deleteimage" style="background-color: #dc3545; border-color: #dc3545; box-shadow: 0 1px 0 #dc3545; text-shadow: 0 -1px 1px #dc3545, 1px 0 1px #dc3545, 0 1px 1px #dc3545, -1px 0 1px #dc3545; color: #fff;" value="Delete Image" /><br />
+                                <span class="description">Please upload am image for your profile.</span>
+                            </td>
+                        </tr>
+                    <?php
+
+                    endforeach;
+                    ?>
+                    <tr>
+                    <th>
+                        <img class="user-preview-image" src="" style="width: auto; height: 100px;">
+                    </th>
+                    <td>
+                        <input type="hidden" name="images" id="images" class="user-doc-new-image regular-text" value="" />
+                        <input type="text" name="image" class="user-doc-image regular-text" id="image" value="" />
+                        <input type='button' class="button-primary uploadimage" value="Upload Image" /><br />
+                        <span class="description">Please upload am image for your profile.</span>
+                    </td>
+                    </tr>
+                </tr>
+    </table><!-- end form-table -->
+    <?php
+} // additional_user_fields
+
+function add_image_doc_field() {
+    if (is_admin()) {
+        echo '<script type="text/javascript">jQuery(document).ready(function($) {
+            $( ".uploadimage" ).on( "click", function() {
+
+                var that = this;
+                var oldFunc = window.send_to_editor;
+
+                tb_show("Добавить документ", "media-upload.php?type=image&TB_iframe=1");
+
+                window.send_to_editor = function( html )
+                {
+                    imgurl = $( "img" + html ).attr( "src" );
+                    $newimage = $( that ).prev(".user-doc-image");
+                    $newimage.val(imgurl);
+                    $( that ).parent("td").prev("th").find(".user-preview-image").attr("src", imgurl);
+                    tb_remove();
+                    window.send_to_editor = oldFunc;
+                    setTimeout(function() {
+                        var $imageurl, images = [];
+
+                        $imageurl = $(".user-preview-image")
+                        $imageurl.each(function(key,data) {
+                            console.log($(data).attr("src"));
+                            images.push($(data).attr("src"));
+                        });
+
+                        $("#images").val(images);
+                    }, 100);
+                }
+
+                return false;
+            });
+
+            $( ".deleteimage" ).on( "click", function() {
+                $(this).closest(".image-row").remove();
+            });
+           });
+    </script>';
+    }
+}
+
+function save_additional_user_meta( $user_id ) {
+    if (empty($_POST['images'])) {
+        $images = "";
+    } else {
+        $images = serialize(explode(';,',$_POST['images']));
+    }
+
+    update_user_meta( $user_id, 'images', $images);
+}
+
+function getRoleUserUploadFile() {
+    if (is_admin()) {
+        $user = get_role('subscriber');
+        $user->add_cap('upload_files');
+    }
+}
+
 /**
 
 /*------------------------------------*\
@@ -250,9 +422,24 @@ function the_excerpt_max_charlength( $string, $charlength ){
 \*------------------------------------*/
 
 // Add Actions
+add_action('admin_head', 'admin_color_scheme');
+add_filter('admin_head', 'remove_personal_options' );
+add_filter('admin_head', 'add_image_doc_field');
+add_action('admin_enqueue_scripts', 'enqueue_admin');
 add_action('init', 'victory_header_scripts'); // Add Custom Scripts to wp_head
 add_action('wp_enqueue_scripts', 'victory_styles'); // Add Theme Stylesheet
 add_action('init', 'register_html5_menu'); // Add HTML5 Blank Menu
+add_action('wp_logout','victory_go_home');
+add_action('user_register', 'auto_login_new_user');
+add_action('show_user_profile', 'show_extra_profile_fields');
+add_action('edit_user_profile', 'show_extra_profile_fields');
+add_action('personal_options_update', 'save_extra_profile_fields');
+add_action('edit_user_profile_update', 'save_extra_profile_fields');
+add_action('show_user_profile', 'additional_user_fields' );
+add_action('edit_user_profile', 'additional_user_fields' );
+add_action('personal_options_update', 'save_additional_user_meta');
+add_action('edit_user_profile_update', 'save_additional_user_meta');
+add_action('admin_init', 'getRoleUserUploadFile');
 
 // Remove Actions
 remove_action('wp_head', 'feed_links_extra', 3); // Display the links to the extra feeds such as category feeds
@@ -285,6 +472,23 @@ add_filter('document_title_parts', function( $parts ){
 	if( isset($parts['page']) ) unset ($parts['page']);
 	return $parts;
 });
+add_filter('user_contactmethods', 'my_user_contactmethods');
+
+function my_user_contactmethods($user_contactmethods){
+
+  $user_contactmethods['patronymic']    = 'Отчество';
+  $user_contactmethods['phone']         = 'Телефон';
+  $user_contactmethods['birthday']      = 'Дата рождения';
+  $user_contactmethods['city']          = 'Город';
+  $user_contactmethods['pass_ser']      = 'Серия паспорта';
+  $user_contactmethods['pass_num']      = 'Номер паспорта';
+  $user_contactmethods['pass_whom']     = 'Кем выдан';
+  $user_contactmethods['pass_date']     = 'Дата выдачи';
+  $user_contactmethods['pass_code']     = 'Код подразделения';
+
+  return $user_contactmethods;
+}
+
 
 // Remove Filters
 remove_filter('the_excerpt', 'wpautop'); // Remove <p> tags from Excerpt altogether
@@ -390,9 +594,8 @@ function custom_post_type_review() {
 
 add_action( 'init', 'custom_post_type_review', 0 );
 
-///////////////////////////////////////////////////////////////////////////////////////////
 /////// If admin create the menu
-///////////////////////////////////////////////////////////////////////////////////////////
+
 if (is_admin()) {
     add_action('admin_menu', 'victory_options_admin_menu');
 }
@@ -410,10 +613,21 @@ function create_onetime_nonce($action = -1) {
     return $nonce . '-' . $time;
 }
 
-function is_login() {
-    $user = wp_get_current_user();
+function verify_onetime_nonce( $_nonce, $action = -1) {
+    $parts = explode( '-', $_nonce );
+    $nonce = $parts[0];
+    $generated = $parts[1];
 
-    return $user->exists();
+    $nonce_life = 60*60;
+    $expires    = (int) $generated + $nonce_life;
+    $expires2   = (int) $generated + 120;
+    $time       = time();
+
+    if( ! wp_verify_nonce( $nonce, $generated.$action ) || $time > $expires ){
+        return false;
+    }
+
+    return true;
 }
 
 ?>

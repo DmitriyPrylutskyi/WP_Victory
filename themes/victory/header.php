@@ -42,7 +42,7 @@ $phone = get_option('phone_options');
                     <p>Победа</p>
                     <span>потребительский корпоратив</span>
                 </a>
-								<?php victory_nav(); ?>
+				<?php victory_nav(); ?>
             </div>
         </div>
     </div>
@@ -62,17 +62,16 @@ $phone = get_option('phone_options');
 </header>
 
 <?php
-
-    if ( is_login() ) {
+    if ( is_user_logged_in() ) {
     ?>
         <script type="application/javascript">
-            $('.main-menu .login a').text('Выйти');
+            $('.main-menu .login a').text('Выйти').attr('data-toggle', '').attr('data-target', '').attr('href', '<?php echo wp_logout_url(); ?>');
         </script>
     <?php
     } else {
     ?>
         <script type="application/javascript">
-            $('.main-menu .login a').text('Войти');
+            $('.main-menu .login a').text('Войти').attr('data-toggle', 'modal').attr('data-target', '#enter').attr('href', '#');
         </script>
     <?php
     }

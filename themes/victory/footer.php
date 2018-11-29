@@ -193,23 +193,24 @@ $phone = get_option('phone_options');
                     <img src="<?php echo get_template_directory_uri(); ?>/img/close-modal.png" alt="close-modal">
                 </button>
                 <h3>Вход в личный кабинет</h3>
-                <form>
-                    <input type="text" placeholder="Телефон" name="phone">
+                <p class="msg"><span id="close"></span></p>
+                <form id="login" method="post">
+                    <input type="text" placeholder="Телефон" name="phone" id="phone" required>
                     <div class="seee-pass">
-                        <input type="password" placeholder="Пароль" name="password" id="my-pass">
+                        <input type="password" placeholder="Пароль" name="password" id="password" required>
                         <input type="checkbox" id="see-pass" onclick="showPass()"><label for="see-pass"><span></span></label>
                     </div>
                     <div class="be-cen">
-                        <input type="checkbox" id="ireadd">
+                        <input type="checkbox" id="ireadd" required>
                         <label for="ireadd"><span></span>Я прочел и согласен с <a href="" data-toggle="modal"
                                 data-target="#leave-order" class="leave-order">Правилами и условиями</a></label>
                     </div>
                     <a href="" data-toggle="modal" data-target="#forgot-pass" class="forgot-pass">Забыли пароль?</a>
+                    <input type="hidden" id="security-login" name="security-login" value="<?php echo create_onetime_nonce( 'login_nonce' ); ?>">
                     <div class="new-link-mod">
                         <a href="" data-toggle="modal" data-target="#sign-up" class="sign-up">Регистрация</a>
-                        <input type="submit" value="Войти">
+                        <input type="button" value="Войти">
                     </div>
-
                 </form>
             </div>
         </div>
@@ -225,7 +226,7 @@ $phone = get_option('phone_options');
                 </button>
                 <h3>Регистрация</h3>
                 <p class="msg"><span id="close"></span></p>
-                <form id="registration">
+                <form id="registration" method="post">
                     <div class="input-grp">
                         <input type="text" name="last_name" id="last_name" placeholder="Фамилия" autocomplete="off" required>
                         <span class="error-msg"></span>
