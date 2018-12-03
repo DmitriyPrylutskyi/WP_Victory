@@ -2,78 +2,78 @@
 /// Register function
 
 if( wp_doing_ajax() ){
-	add_action( 'wp_ajax_nopriv_victory_register_form', 'victory_register_form' );
-	add_action( 'wp_ajax_victory_register_form', 'victory_register_form' );
+	add_action( 'wp_ajax_nopriv_victory_ajax_register_form', 'victory_ajax_register_form' );
+	add_action( 'wp_ajax_victory_ajax_register_form', 'victory_ajax_register_form' );
 }
 
-if( !function_exists('victory_register_form') ) {
+if( !function_exists('victory_ajax_register_form') ) {
 
-    function victory_register_form(){
+    function victory_ajax_register_form(){
 
         $allowed_html =   array();
         $last_name    =   trim( wp_kses ($_POST['last_name'],$allowed_html ));
         $first_name   =   trim( wp_kses ($_POST['first_name'],$allowed_html ));
         $patronymic   =   trim( wp_kses ($_POST['patronymic'],$allowed_html ));
-        $email   			=   trim( wp_kses ($_POST['email'],$allowed_html ));
-        $phone   			=   trim( wp_kses ($_POST['phone'],$allowed_html ));
+        $email        =   trim( wp_kses ($_POST['email'],$allowed_html ));
+        $phone        =   trim( wp_kses ($_POST['phone'],$allowed_html ));
         $password     =   trim( wp_kses( $_POST['password'] ,$allowed_html) );
         $rpassword    =   trim( wp_kses( $_POST['rpassword'] ,$allowed_html) );
 
         if( !verify_onetime_nonce($_POST['nonce'], 'register_nonce') ){
-            echo json_encode(array('register'=>false, 'message'=>'You are not submiting from site or you have too many atempts!'));
+            echo json_encode(array('register'=>false, 'message'=>'Что-то пошло не так. Повторите позже.'));
             exit();
         }
 
         $user_name		= 	$last_name . ' ' . $first_name . ' ' . $patronymic;
 
         if (preg_match("/^[0-9A-Za-z_]+$/", $last_name) == 0) {
-            echo json_encode(array('register'=>false,'message'=>'Invalid username (do not use special characters or spaces)!', 'id'=>'last_name'));
+            echo json_encode(array('register'=>false,'message'=>'Некорректное имя !', 'id'=>'last_name'));
             die();
         }
 
         if (preg_match("/^[0-9A-Za-z_]+$/", $first_name) == 0) {
-            echo json_encode(array('register'=>false,'message'=>'Invalid username (do not use special characters or spaces)!', 'id'=>'first_name'));
+            echo json_encode(array('register'=>false,'message'=>'Некорректное имя !', 'id'=>'first_name'));
             die();
         }
 
         if (preg_match("/^[0-9A-Za-z_]+$/", $patronymic) == 0) {
-            echo json_encode(array('register'=>false,'message'=>'Invalid username (do not use special characters or spaces)!', 'id'=>'patronymic'));
+            echo json_encode(array('register'=>false,'message'=>'Некорректное имя !', 'id'=>'patronymic'));
             die();
         }
 
         if ($email==''){
-            echo json_encode(array('register'=>false,'message'=>'Email field is empty!', 'id'=>'email'));
+            echo json_encode(array('register'=>false,'message'=>'Поле почты пустое!', 'id'=>'email'));
             exit();
         }
 
         if ($user_name==''){
-            echo json_encode(array('register'=>false,'message'=>'Username field is empty!', 'id'=>'last_name'));
+            echo json_encode(array('register'=>false,'message'=>'Поле имя пустое!', 'id'=>'last_name'));
             exit();
         }
 
         if ($phone==''){
-            echo json_encode(array('register'=>false,'message'=>'Phone field is empty!', 'id'=>'phone'));
+            echo json_encode(array('register'=>false,'message'=>'Поле телефон пустое!', 'id'=>'phone'));
             exit();
         }
 
         if(filter_var($email,FvictoryILTER_VALIDATE_EMAIL) === false) {
-            echo json_encode(array('register'=>false,'message'=>'The email doesn\'t look right!', 'id'=>'email'));
+            echo json_encode(array('register'=>false,'message'=>'Почта некорректная!', 'id'=>'email'));
             exit();
         }
 
         $domain = substr(strrchr($email, "@"), 1);
         if( !checkdnsrr ($domain) ){
-            echo json_encode(array('register'=>false,'message'=>'The email\'s domain doesn\'t look right!', 'id'=>'email'));
+            echo json_encode(array('register'=>false,'message'=>'Почта некорректная!', 'id'=>'email'));
             exit();
         }
 
         if ($password=='' || $rpassword=='' ){
-            echo json_encode(array('register'=>false,'message'=>'One of the password field is empty!', 'id'=>'password'));
+            echo json_encode(array('register'=>false,'message'=>'Одно из полей пароля пустое!', 'id'=>'password'));
             exit();
         }
 
         if ($password !== $rpassword ){
-            echo json_encode(array('register'=>false,'message'=>'Passwords do not match!', 'id'=>'password'));
+            echo json_encode(array('register'=>false,'message'=>'Пароли не совпадают!', 'id'=>'password'));
             exit();
         }
 
@@ -87,12 +87,12 @@ if( !function_exists('victory_register_form') ) {
             update_user_meta($user_id, 'patronymic', $patronymic);
             update_user_meta($user_id, 'phone', $phone);
 
-            echo json_encode(array('register'=>true,'message'=>'Auth successful, redirecting...'));
+            echo json_encode(array('register'=>true,'message'=>'Авторизация прошла успешно ...'));
 
             exit();
 
         } else {
-            echo json_encode(array('register'=>false,'message'=>'Phone already exists.  Please choose a new one!', 'id'=>'email'));
+            echo json_encode(array('register'=>false,'message'=>'Пользователь с таким номером уже существует. Пожалуйста используйте другой номер!', 'id'=>'email'));
         }
         die();
 
@@ -103,20 +103,20 @@ if( !function_exists('victory_register_form') ) {
 /// Login function
 
 if( wp_doing_ajax() ){
-	add_action( 'wp_ajax_nopriv_victory_login_form', 'victory_login_form' );
-	add_action( 'wp_ajax_victory_login_form', 'victory_login_form' );
+	add_action( 'wp_ajax_nopriv_victory_ajax_login_form', 'victory_ajax_login_form' );
+	add_action( 'wp_ajax_victory_ajax_login_form', 'victory_ajax_login_form' );
 }
 
-if( !function_exists('victory_login_form') ) {
+if( !function_exists('victory_ajax_login_form') ) {
 
-    function victory_login_form(){
+    function victory_ajax_login_form(){
 
         $allowed_html =   array();
         $phone   			=   trim( wp_kses ($_POST['phone'],$allowed_html ));
         $password     =   trim( wp_kses( $_POST['password'] ,$allowed_html)  );
 
         if( !verify_onetime_nonce($_POST['nonce'], 'login_nonce') ){
-            echo json_encode(array('login'=>false, 'message'=>'You are not submiting from site or you have too many atempts!'));
+            echo json_encode(array('login'=>false, 'message'=>'Что-то пошло не так. Повторите позже.'));
             exit();
         }
 
@@ -125,12 +125,12 @@ if( !function_exists('victory_login_form') ) {
         $user_name = $user[0]->data->user_login;
 
         if ($phone==''){
-            echo json_encode(array('login'=>false,'message'=>'Phone field is empty!', 'id'=>'phone'));
+            echo json_encode(array('login'=>false,'message'=>'Поле телефон пустое!', 'id'=>'phone'));
             exit();
         }
 
         if ($password=='' ){
-            echo json_encode(array('login'=>false,'message'=>'One of the password field is empty!', 'id'=>'password'));
+            echo json_encode(array('login'=>false,'message'=>'Одно из полей пароля пустое!', 'id'=>'password'));
             exit();
         }
 
@@ -143,10 +143,10 @@ if( !function_exists('victory_login_form') ) {
         $user_signon            = wp_signon( $info, true );
 
         if ( is_wp_error($user_signon) ){
-            echo json_encode(array('login'=>false, 'message'=>'Wrong username or password!', 'id'=>'phone'));
+            echo json_encode(array('login'=>false, 'message'=>'Недействительное имя пользователя или пароль!', 'id'=>'phone'));
         } else {
             wp_set_auth_cookie($user_signon->ID);
-            echo json_encode(array('login'=>true, 'message'=>'Auth successful, redirecting...'));
+            echo json_encode(array('login'=>true, 'message'=>'Авторизация прошла успешно ...'));
         }
 
         die();
@@ -154,6 +154,112 @@ if( !function_exists('victory_login_form') ) {
     }
 
 }
+
+/// Ajax Forgot Pass function
+
+add_action( 'wp_ajax_nopriv_victory_ajax_forgot_pass', 'victory_ajax_forgot_pass' );
+add_action( 'wp_ajax_victory_ajax_forgot_pass', 'victory_ajax_forgot_pass' );
+
+if( !function_exists('victory_ajax_forgot_pass') ):
+
+    function victory_ajax_forgot_pass(){
+        global $wpdb;
+
+        //    check_ajax_referer( 'login_ajax_nonce', 'security-forgot' );
+        $allowed_html   =   array();
+        $forgot_email   =   sanitize_text_field( wp_kses( $_POST['forgot_email'],$allowed_html) ) ;
+
+        if( !verify_onetime_nonce($_POST['nonce'], 'forgot_nonce') ){
+            echo 'Что-то пошло не так. Повторите позже.';
+            exit();
+        }
+
+        if ($forgot_email==''){
+            echo 'Поле почты пустое!';
+            exit();
+        }
+
+        //We shall SQL escape the input
+        $user_input = trim($forgot_email);
+
+        $value          = 'Вы попросили сбросить пароль для следующей учетной записи:
+                            %website_url 
+                            Имя: %username.
+                            IЕсли это была ошибка, просто игнорируйте это письмо, и ничего не произойдет. Чтобы сбросить пароль, перейдите по следующему адресу: %reset_link,,
+                            Спасибо!';
+        $value_subject  = 'Запрос на изменение пароля';
+
+        $user_data = get_user_by( 'email', $user_input );
+        if(empty($user_data) || isset( $user_data->caps['administrator'] ) ) {
+            echo'Почта некорректная!';
+            exit();
+        }
+
+        $user_login = $user_data->user_login;
+        $user_email = $user_data->user_email;
+
+        $key = $wpdb->get_var($wpdb->prepare("SELECT user_activation_key FROM $wpdb->users WHERE user_login = %s", $user_login));
+        if(empty($key)) {
+            //generate reset key
+            $key = wp_generate_password(20, false);
+            $wpdb->update($wpdb->users, array('user_activation_key' => $key), array('user_login' => $user_login));
+        }
+
+        //emailing password change request details to the user
+        //$arguments=array(
+        //    'reset_link'        =>  victory_validate_url() . "action=reset_pwd&key=$key&login=" . rawurlencode($user_login)
+        //);
+
+        //victory_emails_filter_replace($user_email,$value,$value_subject,$arguments);
+
+        echo 'Мы только что отправили вам электронное письмо с инструкциями по сбросу пароля.';
+
+        die();
+    }
+endif; // end   victory_ajax_forgot_pass
+
+if( !function_exists('victory_emails_filter_replace')):
+    function  victory_emails_filter_replace($user_email,$message,$subject,$arguments){
+        $arguments ['website_url'] = get_option('siteurl');
+        $arguments ['website_name'] = get_option('blogname');
+        $arguments ['user_email'] = $user_email;
+        $user= get_user_by('email',$user_email);
+        $arguments ['username'] = $user-> user_login;
+
+        foreach($arguments as $key_arg=>$arg_val){
+            $subject = str_replace('%'.$key_arg, $arg_val, $subject);
+            $message = str_replace('%'.$key_arg, $arg_val, $message);
+        }
+
+        victory_email($user_email, $subject, $message);
+    }
+endif;
+
+if (!function_exists('victory_email')):
+    function victory_email($user_email, $subject, $message){
+        $headers = 'From: No Reply <noreply@'.$_SERVER['HTTP_HOST'].'>' . "\r\n";
+        @wp_mail(
+            $user_email,
+            $subject,
+            $message,
+            $headers
+        );
+    };
+endif;
+
+if( !function_exists('victory_validate_url') ):
+    function victory_validate_url() {
+        $page_url = esc_html( home_url() );
+        $urlget = strpos($page_url, "?");
+        if ($urlget === false) {
+            $concate = "?";
+        } else {
+            $concate = "&";
+        }
+        return $page_url.$concate;
+    }
+endif; // end   victory_validate_url
+
 
 /// Ajax Update Personal Info
 
@@ -174,20 +280,22 @@ if( !function_exists('victory_ajax_update_profile') ):
         }
 
         if( !verify_onetime_nonce($_POST['nonce'], 'personal_nonce') ){
-            print('You are not submiting from site or you have too many atempts!');
+            print('Что-то пошло не так. Повторите позже.');
             exit();
         }
 
         $allowed_html   =   array();
+        $foto           =   sanitize_text_field ( wp_kses( $_POST['foto'] ,$allowed_html) );
         $firstname      =   sanitize_text_field ( wp_kses( $_POST['firstname'] ,$allowed_html) );
         $lastname     	=   sanitize_text_field ( wp_kses( $_POST['lastname'] ,$allowed_html)) ;
         $patronymic     =   sanitize_text_field ( wp_kses( $_POST['patronymic'] ,$allowed_html)) ;
-        $email      		=   sanitize_text_field ( wp_kses( $_POST['useremail'] ,$allowed_html) );
-        $phone      		=   sanitize_text_field ( wp_kses( $_POST['userphone'] ,$allowed_html) );
+        $email      	=   sanitize_text_field ( wp_kses( $_POST['useremail'] ,$allowed_html) );
+        $phone      	=   sanitize_text_field ( wp_kses( $_POST['userphone'] ,$allowed_html) );
         $birthday     	=   sanitize_text_field ( wp_kses( $_POST['userbirthday'] ,$allowed_html) );
-        $city      			=   sanitize_text_field ( wp_kses( $_POST['usercity'] ,$allowed_html) );
-        $gender      		=   sanitize_text_field ( wp_kses( $_POST['gender'] ,$allowed_html) );
+        $city      		=   sanitize_text_field ( wp_kses( $_POST['usercity'] ,$allowed_html) );
+        $gender      	=   sanitize_text_field ( wp_kses( $_POST['gender'] ,$allowed_html) );
 
+        update_user_meta($userID, 'foto', $foto);
         update_user_meta($userID, 'first_name', $firstname);
         update_user_meta($userID, 'last_name', $lastname);
         update_user_meta($userID, 'patronymic', $patronymic);
@@ -195,35 +303,36 @@ if( !function_exists('victory_ajax_update_profile') ):
         update_user_meta($userID, 'phone', $phone);
         update_user_meta($userID, 'birthday', $birthday);
         update_user_meta($userID, 'city', $city);
-				update_user_meta($userID, 'gender', $gender);
+		update_user_meta($userID, 'gender', $gender);
 
         $user = get_users(array('meta_key' => 'phone', 'meta_value' => $phone));
 
         if($userID == $user[0]->data->ID ) {
         		if($phone==''){
-                print ('The phone field cannot be blank. ');
+                print ('Поле телефон пустое!');
                 exit();
 						} else if($email==''){
-                print ('The email field cannot be blank. ');
+                print ('Поле почты пустое!');
                 exit();
             } else if(filter_var($email,FILTER_VALIDATE_EMAIL) === false) {
-                print ( 'The email doesn\'t look right !');
+                print ( 'Почта некорректная!');
                 exit();
             } else if($gender=='') {
-                print ( 'The gender field cannot be blank.');
+                print ( 'Не выбран пол!');
                 exit();
             }
             else{
                 $args = array(
                     'ID'         => $userID,
                     'user_email' => $email,
+                    'foto'       => $foto,
                     'first_name' => $firstname,
                     'last_name'  => $lastname,
                     'patronymic' => $patronymic,
-                    'phone'			 => $phone,
+                    'phone'		 => $phone,
                     'birthday'	 => $birthday,
-                    'city'			 => $city,
-                    'gender'		 => $gender
+                    'city'		 => $city,
+                    'gender'	 => $gender
                 );
 
                 wp_update_user( $args );
@@ -232,7 +341,7 @@ if( !function_exists('victory_ajax_update_profile') ):
             }
         }
 
-        print ('The phone was not saved because it is used by another user. ');
+        print ('Телефон не был сохранен, потому что он используется другим пользователем.');
 
         die();
     }
@@ -257,7 +366,7 @@ if( !function_exists('victory_ajax_update_passport') ):
         }
 
         if( !verify_onetime_nonce($_POST['nonce'], 'passport_nonce') ){
-            print('You are not submiting from site or you have too many atempts!');
+            print('Что-то пошло не так. Повторите позже.');
             exit();
         }
 
@@ -285,7 +394,7 @@ if( !function_exists('victory_ajax_update_passport') ):
         );
 
         wp_update_user( $args );
-        print ('Passport updated');
+        print ('Пароль обновлен');
 
 
         die();
@@ -311,7 +420,7 @@ if( !function_exists('victory_ajax_change_pass') ):
         }
 
         if( !verify_onetime_nonce($_POST['nonce'], 'password_nonce') ){
-            print ('You are not submiting from site or you have too many atempts!');
+            print ('Что-то пошло не так. Повторите позже.');
             exit();
         }
 
@@ -320,26 +429,26 @@ if( !function_exists('victory_ajax_change_pass') ):
         $renewpass      =   sanitize_text_field ( wp_kses( $_POST['renewpass'] ,$allowed_html) );
 
         if($newpass=='' || $renewpass=='' ){
-            print ('The new password is blank');
+            print ('Новый пароль пустой!');
             die();
         }
 
         if($newpass != $renewpass){
-            print ('Passwords do not match');
+            print ('Пароли не совпадают!');
             die();
         }
 
         $user = get_user_by( 'id', $userID );
         if ( $user && wp_check_password( $oldpass, $user->data->user_pass, $user->ID) ){
             wp_set_password( $newpass, $user->ID );
-            print ('Password Updated - You will need to logout and login again ');
+            print ('Обновлен пароль - вам нужно будет снова выйти и войти в систему!');
         }else{
-            print ('Old Password is not correct');
+            print ('Старый пароль не верен!');
         }
 
         die();
     }
-endif; // end   wpestate_ajax_update_pass
+endif; // end  vicory_ajax_change_pass
 
 /// Ajax Update Doc function
 
@@ -351,7 +460,6 @@ if( !function_exists('victory_ajax_update_doc') ):
         $current_user   = wp_get_current_user();
         $allowed_html   = array();
         $userID         = $current_user->ID;
-        //$images         = get_the_author_meta( 'images', $userID );
 
         if ( !is_user_logged_in() ) {
             exit('ko');
@@ -361,7 +469,7 @@ if( !function_exists('victory_ajax_update_doc') ):
         }
 
         if( !verify_onetime_nonce($_POST['nonce'], 'doc_nonce') ){
-            print ('You are not submiting from site or you have too many atempts!');
+            print ('Что-то пошло не так. Повторите позже.');
             exit();
         }
 
@@ -375,10 +483,86 @@ if( !function_exists('victory_ajax_update_doc') ):
 
         update_user_meta( $userID, 'images', $images);
 
-        print ('Doc Updated');
+        print ('Документы обновлены');
 
         die();
     }
-endif; // end   wpestate_ajax_update_pass
+endif; // end  victory_ajax_update_doc
+
+/// Add Deposit function
+
+if( wp_doing_ajax() ){
+    add_action( 'wp_ajax_nopriv_victory_ajax_add_deposit', 'victory_ajax_add_deposit' );
+    add_action( 'wp_ajax_victory_ajax_add_deposit', 'victory_ajax_add_deposit' );
+}
+
+if( !function_exists('victory_ajax_add_deposit') ) {
+
+    function victory_ajax_add_deposit(){
+
+        $current_user   = wp_get_current_user();
+        $full_name      = $current_user->display_name;
+        $userID         = $current_user->ID;
+        $allowed_html   = array();
+
+        if ( !is_user_logged_in() ) {
+            exit('ko');
+        }
+        if($userID === 0 ){
+            exit('out pls');
+        }
+
+        $amount       =   trim( wp_kses ($_POST['amount'],$allowed_html ));
+        $refill       =   trim( wp_kses ($_POST['refill'],$allowed_html ));
+        $rate         =   trim( wp_kses ($_POST['rate'],$allowed_html ));
+        $period       =   trim( wp_kses ($_POST['period'],$allowed_html ));
+
+        if( !verify_onetime_nonce($_POST['nonce'], 'security-deposit') ){
+            print ('Что-то пошло не так. Повторите позже.');
+            exit();
+        }
+
+        if ($amount==''){
+            print ('Поле Сумыы Вложения пустое!');
+            exit();
+        }
+
+        if ($refill==''){
+             print ('Поле Сумыы Ежемесячного пополнения пустое!');
+            exit();
+        }
+
+        $post = array(
+            'post_status'   => 'pending',
+            'post_type'     => 'deposit' ,
+            'post_author'   => $userID
+        );
+        $post_id =  wp_insert_post($post );
+
+        if($post_id) {
+            $arg = array(
+                'ID' => $post_id,
+                'post_title' => 'Вклад № ' .  $post_id
+            );
+            wp_update_post( wp_slash($arg) );
+
+            update_field( 'full_name' , $full_name, $post_id );
+            update_field( 'amount' , $amount, $post_id );
+            update_field( 'refill' , $refill, $post_id );
+            update_field( 'rate' , $rate, $post_id );
+            update_field( 'period' , $period, $post_id );
+
+            print ('Заявка отправлена');
+        } else {
+            print ('Повторите попытку позже');
+        }
+
+        wp_reset_query();
+
+        die();
+
+    }
+
+}
 
 ?>

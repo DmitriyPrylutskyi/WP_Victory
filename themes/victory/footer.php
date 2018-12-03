@@ -172,7 +172,7 @@ $phone = get_option('phone_options');
                             </table>
                         </a>
 
-                        <button class="go-to-other">Продолжить</button>
+                        <button class="go-to-other" id="add-deposit">Продолжить</button>
                         <span class="rull-go-to">Нажимая "продолжить" я принимаю все вышеперечисленые условия</span>
                     </div>
                 </div>
@@ -279,12 +279,14 @@ $phone = get_option('phone_options');
                     <img src="<?php echo get_template_directory_uri(); ?>/img/close-modal.png" alt="close-modal">
                 </button>
                 <h3>Забыли пароль?</h3>
+                <p class="msg"><span id="close"></span></p>
                 <form>
                     <!-- <p>На указанную почту будет отправлено письмо с инструкциями</p> -->
-                    <input type="email" placeholder="Почта">
+                    <input type="hidden" id="security-forgot" name="security-forgot" value="<?php echo create_onetime_nonce( 'forgot_nonce' ); ?>">
+                    <input type="email" id="forgot-email" placeholder="Почта">
                     <div class="new-link-mod">
                         <a href="" data-toggle="modal" data-target="#sign-up" class="sign-up">Регистрация</a>
-                        <input type="submit" value="Отправить">
+                        <input type="submit" id="forgot-password" value="Отправить">
                     </div>
                 </form>
             </div>

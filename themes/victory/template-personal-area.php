@@ -7,6 +7,15 @@ if ( !is_user_logged_in() ) {
 
 get_header();
 
+global $post;
+
+//section calc
+$rate_3 = get_option('month_3_rate_options');
+$rate_6 = get_option('month_6_rate_options');
+$rate_12 = get_option('month_12_rate_options');
+$rate_24 = get_option('month_24_rate_options');
+$rate_termless = get_option('termless_rate_options');
+
 $current_user           =   wp_get_current_user();
 $userID                 =   $current_user->ID;
 $user_login             =   $current_user->user_login;
@@ -23,7 +32,9 @@ $pass_num               =   get_the_author_meta( 'pass_num' , $userID );
 $pass_whom              =   get_the_author_meta( 'pass_whom' , $userID );
 $pass_date              =   get_the_author_meta( 'pass_date' , $userID );
 $pass_code              =   get_the_author_meta( 'pass_code' , $userID );
+$user_amount            =   get_the_author_meta( 'user_amount' , $userID );
 $images                 =   unserialize(get_the_author_meta( 'images', $userID ));
+$foto                   =   get_the_author_meta( 'foto', $userID );
 
 // Load upload an thickbox script
 wp_enqueue_script('media-upload');
@@ -52,10 +63,22 @@ wp_enqueue_style('thickbox');
                             <li class="nav-item">
                                 <a class="nav-link last-link" data-toggle="tab" href="#in-time">Действующие вклады</a>
                             </li>
+                            <?php if ( $user_amount >= 50000 ) : ?>
                             <li class="status-off">
                                 <p>статус :</p>
-                                <span>Бронзовый</span>
+                                <?php
+                                if ( $user_amount >= 50000 && $user_amount < 100000 ) {
+                                        echo "<span>Бронзовый</span>";
+                                    } else if ( $user_amount >= 100000 && $user_amount < 500000 ) {
+                                        echo "<span>Серебряный</span>";
+                                    } else if ( $user_amount >= 500000 && $user_amount < 1000000 ) {
+                                        echo "<span>Золотой</span>";
+                                    } else if ( $user_amount >= 1000000 ) {
+                                        echo "<span>Платиновый</span>";
+                                    }
+                                ?>
                             </li>
+                            <?php endif; ?>
                         </ul>
                         <!-- Tab panes -->
                         <div class="tab-content">
@@ -66,6 +89,20 @@ wp_enqueue_style('thickbox');
                                     <div>
                                         <form>
                                             <div class="left-part">
+                                                <div class="one-line">
+                                                    <label for="" id="avatar-chn" class="can-lable">Фото</label>
+                                                    <div class="foto-block-ava">
+                                                        <div class="avatar-wrapper">
+                                                            <img class="profile-pic" src="<?php echo $foto; ?>" />
+
+                                                            <div class="upload-button" id="upload-button">
+                                                                <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+                                                            </div>
+                                                            <input type="hidden" name="foto" id="foto" value="<?php echo $foto; ?>" class="regular-text" />
+                                                            <input class="file-upload" id="file-upload" type="file" accept="image/*"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div class="one-line">
                                                     <label for="last_name" class="can-lable">Фамилия</label>
                                                     <input type="text" id="last_name" name="last_name" placeholder="Фамилия" value="<?php echo $last_name; ?>">
@@ -99,14 +136,14 @@ wp_enqueue_style('thickbox');
                                             <div class="clean"></div>
                                             <div class="bot-infoo">
                                                 <div class="one-line">
+                                                    <label for="user_email" class="can-lable">E-mail</label>
+                                                    <input type="email" id="user_email" name="user_email" placeholder="E-mail" value="<?php echo $user_email; ?>">
+                                                    <!--<a href="">Верифицировать</a>-->
+                                                </div>
+                                                <div class="one-line">
                                                     <label for="user_phone" class="can-lable">Телефон</label>
                                                     <input type="text" id="user_phone" name="user_phone" placeholder="Телефон" value="<?php echo $user_phone; ?>">
                                                     <a href="">Подтвердить</a>
-                                                </div>
-                                                <div class="one-line">
-                                                    <label for="user_email" class="can-lable">E-mail</label>
-                                                    <input type="email" id="user_email" name="user_email" placeholder="E-mail" value="<?php echo $user_email; ?>">
-                                                    <a href="">Верифицировать</a>
                                                 </div>
                                             </div>
                                             <input type="hidden" id="security-personal" name="security-personal" value="<?php echo create_onetime_nonce( 'personal_nonce' ); ?>">
@@ -211,35 +248,36 @@ wp_enqueue_style('thickbox');
                                     <div class="col-12">
                                         <div class="wrapper-calc">
                                             <div class="data">
+                                                <div id="deposit_info_message"></div>
                                                 <form id="calc" action="">
                                                     <div class="input-period">
-                                                        <input name="period" type="radio" id="period1" checked>
+                                                        <input name="period" type="radio" id="period1" value="24" data-rate="<?php echo $rate_24; ?>" checked>
                                                         <label for="period1">
                                                             <span></span>
                                                             2 года
                                                         </label>
-                                                        <input name="period" type="radio" id="period2">
+                                                        <input name="period" type="radio" id="period2" value="12" data-rate="<?php echo $rate_12; ?>" >
                                                         <label for="period2">
                                                             <span></span>
                                                             1 год
                                                         </label>
-                                                        <input name="period" type="radio" id="period3">
+                                                        <input name="period" type="radio" id="period3" value="6" data-rate="<?php echo $rate_6; ?>" >
                                                         <label for="period3">
                                                             <span></span>
                                                             6 месяцев
                                                         </label>
-                                                        <input name="period" type="radio" id="period4">
+                                                        <input name="period" type="radio" id="period4" value="3" data-rate="<?php echo $rate_3; ?>" >
                                                         <label for="period4">
                                                             <span></span>
                                                             3 месяца
                                                         </label>
-                                                        <input name="period" type="radio" id="period5">
+                                                        <input name="period" type="radio" id="period5" value="1" data-rate="<?php echo $rate_termless; ?>" >
                                                         <label for="period5">
                                                             <span></span>
                                                             бессрочное
                                                         </label>
                                                     </div>
-                                                    <div class="input-method">
+                                                    <!--<div class="input-method">
                                                         <input name="method" type="radio" id="method1" checked>
                                                         <label for="method1">
                                                             <span></span>
@@ -250,7 +288,7 @@ wp_enqueue_style('thickbox');
                                                             <span></span>
                                                             Долгосрочное закрытие вклада
                                                         </label>
-                                                    </div>
+                                                    </div>-->
                                                     <div class="input-amount-block">
                                                         <div id="slider-amount" class="slider"></div>
                                                         <div class="input-amount">
@@ -278,22 +316,23 @@ wp_enqueue_style('thickbox');
                                                     Доход по сбережению
                                                 </span>
                                                 <span class="value" id="income" form="calc">
-                                                    55
+                                                    4500
                                                 </span>
                                                 <span class="caption">
                                                     Процентная ставка
                                                 </span>
                                                 <span class="value" id="interest-rate" form="calc">
-                                                    18
+                                                    <?php echo $rate_24; ?>
                                                     <span class="unit">%</span>
                                                 </span>
                                                 <span class="caption">
                                                     Сумма к концу срока
                                                 </span>
                                                 <span class="value" id="total" form="calc">
-                                                    1055
+                                                    28500
                                                 </span>
-                                                <button type="submit" data-toggle="modal" data-target="#leave-order">Оставить заявку</button>
+                                                <input type="hidden" id="security-deposit" name="security-deposit" value="<?php echo create_onetime_nonce( 'security-deposit' ); ?>">
+                                                <button type="button" data-toggle="modal" data-target="#leave-order">Оставить заявку</button>
                                             </div>
                                         </div>
                                     </div>
@@ -362,57 +401,97 @@ wp_enqueue_style('thickbox');
                                                 <th></th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>00287</td>
-                                                <td>12.10.18</td>
-                                                <td>180 дн.</td>
-                                                <td>20000</td>
-                                                <td>15 %</td>
-                                                <td>2470 %</td>
-                                                <td>374 <img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></td>
-                                                <td><a href="" class="act">Снять</a><button data-toggle="popover" data-placement="top" data-trigger="focus" data-content="Test" title="title">?</button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>00287</td>
-                                                <td>12.10.18</td>
-                                                <td>180 дн.</td>
-                                                <td>20000</td>
-                                                <td>15 %</td>
-                                                <td>2470 %</td>
-                                                <td>374 <img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></td>
-                                                <td><a href="" class="act">Снять</a><button data-toggle="popover" data-placement="top" data-trigger="focus" data-content="Test" title="title">?</button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>00287</td>
-                                                <td>12.10.18</td>
-                                                <td>180 дн.</td>
-                                                <td>20000</td>
-                                                <td>15 %</td>
-                                                <td>2470 %</td>
-                                                <td>374 <img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></td>
-                                                <td><a href="" class="act">Снять</a><button data-toggle="popover" data-placement="top" data-trigger="focus" data-content="Test" title="title">?</button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>00287</td>
-                                                <td>12.10.18</td>
-                                                <td>180 дн.</td>
-                                                <td>20000</td>
-                                                <td>15 %</td>
-                                                <td>2470 %</td>
-                                                <td>374 <img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></td>
-                                                <td><a href="" class="not-act">Снять</a><button data-toggle="popover" data-placement="top" data-trigger="focus" data-content="Test" title="title">?</button></td>
-                                            </tr>
-                                            <tr>
-                                                <td>00287</td>
-                                                <td>12.10.18</td>
-                                                <td>180 дн.</td>
-                                                <td>20000</td>
-                                                <td>15 %</td>
-                                                <td>2470 %</td>
-                                                <td>374 <img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></td>
-                                                <td><a href="" class="act">Снять</a><button data-toggle="popover" data-placement="top" data-trigger="focus" data-content="Test" title="title">?</button></td>
-                                            </tr>
+                                            <?php
+                                            $args = array(
+                                                'post_type' => 'deposit',
+                                                'post_status' => 'publish',
+                                                'orderby' => 'post_date',
+                                                'order' => 'DESC'
+                                            );
+
+                                            $deposits = new WP_Query($args);
+
+                                            if ( $deposits->have_posts() ) :
+                                                    while ( $deposits->have_posts() ) : $deposits->the_post();
+                                                    ?>
+                                                    <tr>
+                                                        <?php
+                                                            $full_name = get_field('full_name');
+                                                            $deposit_closed = get_field('deposit_closed');
+
+                                                            if ( $full_name == $user_login && !$deposit_closed ) {
+                                                                $number = preg_replace("/[^,.0-9]/", '', get_the_title());
+                                                                $zero = str_repeat("0", 5 - strlen($number));
+                                                                $number = $zero . $number;
+
+
+                                                                $deposit_opened = get_field('deposit_opened');
+                                                                $close_deposit_date = get_field('close_deposit_date');
+                                                                 $period = get_field('period');
+                                                                $amount = get_field('amount');
+                                                                $refill = get_field('refill');
+                                                                $rate = get_field('rate');
+                                                                $date_period_between_date = floor((strtotime($close_deposit_date) - strtotime($deposit_opened)) / (60 * 60 * 24));
+                                                                $$day_in_year = 365;
+                                                                $date_between_date = floor((time() - strtotime($deposit_opened)) / (60 * 60 * 24));
+
+                                                                if ($date_period_between_date >= 365) {
+                                                                    switch (bcmod($date_period_between_date, '365')) {
+                                                                        case 0:
+                                                                            $day_in_year = 365;
+                                                                            break;
+                                                                        case 1:
+                                                                            $day_in_year = 366;
+                                                                            break;
+                                                                    }
+                                                                }
+
+                                                                $rate_per_day = $rate / $day_in_year / 100;
+
+                                                                $current_amount = $amount;
+                                                                $total_amount = $amount;
+                                                                $total_refill = $refill;
+                                                                $total_percent = 0;
+
+                                                                for ($i = 0; $i < $date_between_date; ++$i) {
+                                                                    $m = 1;
+                                                                    $percent = $current_amount * $rate_per_day;
+                                                                    $total_percent += $rate_per_day*100;
+                                                                    $total_amount += $percent;
+
+                                                                    $counter = strtotime("+" . $i . " day", $deposit_opened);
+                                                                    $over_month = strtotime("+" . $m . " month", $deposit_opened);
+
+                                                                    if ($counter == $over_month) {
+                                                                        $total_amount += $refill;
+                                                                        $total_refill += $refill;
+                                                                        $current_amount += $refill;
+                                                                        ++$m;
+                                                                    }
+                                                                }
+                                                                ?>
+                                                                <td><?php echo $number; ?></td>
+                                                                <td><?php echo date('d.m.y', strtotime($deposit_opened)); ?></td>
+                                                                <td><?php echo $period; ?> мес.</td>
+                                                                <td><?php echo $amount; ?></td>
+                                                                <td><?php echo $rate; ?> %</td>
+                                                                <td><?php echo round($total_percent, 2); ?> %</td>
+                                                                <td><?php echo round($total_amount, 2); ?><img
+                                                                            src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png"
+                                                                            alt="rb-sing"></td>
+                                                                <td><a href=""
+                                                                       class="<?php echo (strtotime(date('d.m.y')) >= strtotime($close_deposit_date)) ? 'act' : 'not-act'; ?>">Снять</a>
+                                                                    <button data-toggle="popover" data-placement="top"
+                                                                            data-trigger="focus" data-content="Test"
+                                                                            title="title">?
+                                                                    </button>
+                                                                </td>
+                                                                </tr>
+                                                                <?php
+                                                            }
+                                                    endwhile;
+                                                    endif;
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -437,31 +516,54 @@ wp_enqueue_style('thickbox');
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td>00287</td>
-                                                    <td>12.10.18</td>
-                                                    <td>180 дн.</td>
-                                                    <td>20000</td>
-                                                    <td>15 %</td>
-                                                    <td>2470 %</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>00287</td>
-                                                    <td>12.10.18</td>
-                                                    <td>180 дн.</td>
-                                                    <td>20000</td>
-                                                    <td>15 %</td>
-                                                    <td>2470 %</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>00287</td>
-                                                    <td>12.10.18</td>
-                                                    <td>180 дн.</td>
-                                                    <td>20000</td>
-                                                    <td>15 %</td>
-                                                    <td>2470 %</td>
-                                                </tr>
-                                            </tbody>
+                                                <?php
+                                                if ( $deposits->have_posts() ) :
+                                                    while ( $deposits->have_posts() ) : $deposits->the_post();
+                                                    ?>
+                                                    <tr>
+                                                        <?php
+                                                            $full_name = get_field('full_name');
+                                                            $deposit_closed = get_field('deposit_closed');
+
+                                                            if ( $full_name == $user_login && $deposit_closed ) {
+                                                                $number = preg_replace("/[^,.0-9]/", '', get_the_title());
+                                                                $zero = str_repeat("0", 5 - strlen($number));
+                                                                $number = $zero . $number;
+
+
+                                                                $deposit_opened = get_field('deposit_opened');
+                                                                $close_deposit_date = get_field('close_deposit_date');
+                                                                $period = get_field('period');
+                                                                $amount = get_field('amount');
+                                                                $refill = get_field('refill');
+                                                                $rate = get_field('rate');
+
+                                                                $rate_per_month = $rate /12/100;
+                                                                $current_amount = $amount;
+                                                                $total_amount = $amount;
+                                                                $total_refill = $amount;
+                                                                $total_percent = 0;
+
+                                                                for($i=0; $i<$period; ++$i)
+                                                                  {
+                                                                      $percent = $current_amount * $rate_per_month;
+                                                                      $total_percent += $rate_per_month*100;
+                                                                  }
+                                                                ?>
+                                                                <td><?php echo $number; ?></td>
+                                                                <td><?php echo date('d.m.y', strtotime($deposit_opened)); ?></td>
+                                                                <td><?php echo $period; ?> мес.</td>
+                                                                <td><?php echo $amount; ?></td>
+                                                                <td><?php echo $rate; ?> %</td>
+                                                                <td><?php echo round($total_percent); ?> %</td>
+                                                    </tr>
+                                                        <?php
+                                                            }
+                                                    endwhile;
+                                                    wp_reset_postdata();
+                                                  endif;
+                                            ?>
+                                              </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -495,13 +597,39 @@ wp_enqueue_style('thickbox');
             return false;
         });
 
+        $( '.file-upload' ).on( 'click', function(e) {
+            e.preventDefault();
+
+            tb_show('Добавить фото', '/wp-admin/media-upload.php?type=image&amp&TB_iframe=1');
+
+            var oldFunc = window.send_to_editor;
+
+            window.send_to_editor = function( html )
+            {
+                imgurl = $( html  ).attr( 'src' );
+                $( '#foto' ).val(imgurl);
+                tb_remove();
+                $('.profile-pic').attr('src', imgurl);
+                window.send_to_editor = oldFunc;
+            }
+
+            return false;
+        });
+
+
+
         $( '#user-docs-wrapper .btn-danger' ).on( 'click', function(e) {
             $(this).parent('.image-doc-wrapper').remove();
         });
 
-        $('a[href$="profile"').click(function() {
+        $('a[href$="profile"]').click(function() {
             $('#personal_info_message').empty();
             $('#passport_info_message').empty();
+        });
+
+        $('a[href$="open-vklad"]').click(function() {
+            $('#deposit_info_message').empty();
+            calcresult();
         });
     });
 </script>

@@ -18,8 +18,8 @@ $i = 1;
 if( have_rows('advantages') ):
     while ( have_rows('advantages') ) : the_row();
 
-            $image_short[$i]     = get_sub_field('advantage_image_short');
-            $image_long[$i]      = get_sub_field('advantage_image_long');
+            $image_short[$i]    = get_sub_field('advantage_image_short');
+            $image_long[$i]     = get_sub_field('advantage_image_long');
             $description_short  = get_sub_field('advantage_description_short');
             $description_long   = get_sub_field('advantage_description_long');
 
@@ -171,7 +171,7 @@ if ( $query->have_posts() ) {
                                     бессрочное
                                 </label>
                             </div>
-                            <div class="input-method">
+                           <!-- <div class="input-method">
                                 <input name="method" type="radio" id="method1" checked>
                                 <label for="method1">
                                     <span></span>
@@ -182,7 +182,7 @@ if ( $query->have_posts() ) {
                                     <span></span>
                                     Долгосрочное закрытие вклада
                                 </label>
-                            </div>
+                            </div>-->
                             <div class="input-amount-block">
                                 <div id="slider-amount" class="slider"></div>
                                 <div class="input-amount">
@@ -210,7 +210,7 @@ if ( $query->have_posts() ) {
                                 Доход по сбережению
                             </span>
                         <span class="value" id="income" form="calc">
-                                2000
+                                4500
                             </span>
                         <span class="caption">
                                 Процентная ставка
@@ -223,7 +223,7 @@ if ( $query->have_posts() ) {
                                 Сумма к концу срока
                             </span>
                         <span class="value" id="total" form="calc">
-                                26000
+                                28500
                             </span>
                         <button type="submit" form="calc">Оставить заявку</button>
                     </div>

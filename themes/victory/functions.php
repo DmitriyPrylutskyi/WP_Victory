@@ -312,7 +312,6 @@ function additional_user_fields( $user ) {
             <th>
                 <label>Загрузите документ</label>
             </th>
-        </tr>
             <?php
                 $images = get_the_author_meta( 'images', $user->ID );
                 if( $images == "" ) {
@@ -351,7 +350,7 @@ function additional_user_fields( $user ) {
                         <span class="description">Please upload am image for your profile.</span>
                     </td>
                     </tr>
-                </tr>
+        </tr>
     </table><!-- end form-table -->
     <?php
 } // additional_user_fields
@@ -379,7 +378,6 @@ function add_image_doc_field() {
 
                         $imageurl = $(".user-preview-image")
                         $imageurl.each(function(key,data) {
-                            console.log($(data).attr("src"));
                             images.push($(data).attr("src"));
                         });
 
@@ -408,11 +406,99 @@ function save_additional_user_meta( $user_id ) {
     update_user_meta( $user_id, 'images', $images);
 }
 
+function additional_user_foto_field( $user ) {
+    ?>
+    <h3>Фото пользователя</h3>
+
+    <table class="form-table">
+
+        <tr>
+            <th>
+                <label>Загрузите фото</label>
+            </th>
+        </tr>
+        <?php
+            $foto = get_the_author_meta( 'foto', $user->ID );
+        ?>
+        <tr class="image-row" >
+            <th>
+                <img class="user-preview-foto" style="width: auto; height: 100px;" src="<?php echo $foto; ?>">
+            </th>
+            <td>
+                <input type="text" name="foto" id="foto" class="user-foto regular-text" value="<?php echo $foto; ?>" class="regular-text" />
+                <input type='button' class="button-primary uploadfoto" value="Upload Foto" /><br />
+                <span class="description">Please upload a foto for your profile.</span>
+            </td>
+        </tr>
+    </table><!-- end form-table -->
+    <?php
+} // end additional_user_image_field
+
+function add_user_foto_field() {
+    if (is_admin()) {
+        echo '<script type="text/javascript">jQuery(document).ready(function($) {
+            $( ".uploadfoto" ).on( "click", function() {
+                var that = this;
+                var oldFunc = window.send_to_editor;
+
+                tb_show("Добавить фото", "media-upload.php?type=image&TB_iframe=1");
+
+                window.send_to_editor = function( html )
+                {
+                    imgurl = $( "img" + html ).attr( "src" );
+                    $newfoto = $( that ).prev(".user-foto");
+                                        console.log($newfoto);
+                    $newfoto.val(imgurl);
+                    $( that ).parent("td").prev("th").find(".user-preview-foto").attr("src", imgurl);
+                    tb_remove();
+                    window.send_to_editor = oldFunc;
+                    setTimeout(function() {
+                        var foto;
+
+                        //foto = $(".user-preview-foto").attr("src");
+
+                        //$("#foto").val(foto);
+                    }, 100);
+                }
+
+                return false;
+            });
+
+           });
+    </script>';
+    }
+}
+
+function save_user_foto_meta( $user_id ) {
+    $foto = $_POST['foto'];
+    update_user_meta( $user_id, 'foto', $foto);
+}
+
 function getRoleUserUploadFile() {
     if (is_admin()) {
         $user = get_role('subscriber');
         $user->add_cap('upload_files');
     }
+}
+
+function update_post( $post_id ) {
+    $deposit_opened = strtotime(get_field('deposit_open'));
+    $deposit_period = get_field('period');
+    $deposit_close = date("d-m-Y", strtotime("+" . $deposit_period ." month", $deposit_opened));
+
+    update_field( 'deposit_opened' , $deposit_opened, $post_id );
+    update_field( 'close_deposit_date' , $deposit_close, $post_id );
+    return $post_id;
+}
+
+function conditional_logic() {
+        ?>
+        <script type="text/javascript">
+            jQuery(window).load(function () {
+                jQuery('.disabled .acf-input .hasDatepicker').attr("disabled", "disabled");
+            })
+        </script>
+    <?php
 }
 
 /**
@@ -423,9 +509,10 @@ function getRoleUserUploadFile() {
 
 // Add Actions
 add_action('admin_head', 'admin_color_scheme');
-add_filter('admin_head', 'remove_personal_options' );
-add_filter('admin_head', 'add_image_doc_field');
 add_action('admin_enqueue_scripts', 'enqueue_admin');
+add_action( 'admin_enqueue_scripts', function(){
+    wp_enqueue_style( 'admin-styles', get_template_directory_uri() .'/css/admin.css' );
+}, 99 );
 add_action('init', 'victory_header_scripts'); // Add Custom Scripts to wp_head
 add_action('wp_enqueue_scripts', 'victory_styles'); // Add Theme Stylesheet
 add_action('init', 'register_html5_menu'); // Add HTML5 Blank Menu
@@ -435,11 +522,17 @@ add_action('show_user_profile', 'show_extra_profile_fields');
 add_action('edit_user_profile', 'show_extra_profile_fields');
 add_action('personal_options_update', 'save_extra_profile_fields');
 add_action('edit_user_profile_update', 'save_extra_profile_fields');
+add_action('show_user_profile', 'additional_user_foto_field' );
+add_action('edit_user_profile', 'additional_user_foto_field' );
+add_action('personal_options_update', 'save_user_foto_meta');
+add_action('edit_user_profile_update', 'save_user_foto_meta');
 add_action('show_user_profile', 'additional_user_fields' );
 add_action('edit_user_profile', 'additional_user_fields' );
 add_action('personal_options_update', 'save_additional_user_meta');
 add_action('edit_user_profile_update', 'save_additional_user_meta');
 add_action('admin_init', 'getRoleUserUploadFile');
+add_action('acf/save_post' , 'update_post');
+add_action('admin_head', 'conditional_logic');
 
 // Remove Actions
 remove_action('wp_head', 'feed_links_extra', 3); // Display the links to the extra feeds such as category feeds
@@ -456,6 +549,9 @@ remove_action('wp_head', 'rel_canonical');
 remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
 
 // Add Filters
+add_filter('admin_head', 'remove_personal_options' );
+add_filter('admin_head', 'add_image_doc_field');
+add_filter('admin_head', 'add_user_foto_field');
 add_filter('body_class', 'add_slug_to_body_class'); // Add slug to body class (Starkers build)
 add_filter('widget_text', 'do_shortcode'); // Allow shortcodes in Dynamic Sidebar
 add_filter('widget_text', 'shortcode_unautop'); // Remove <p> tags in Dynamic Sidebars (better!)
@@ -473,6 +569,28 @@ add_filter('document_title_parts', function( $parts ){
 	return $parts;
 });
 add_filter('user_contactmethods', 'my_user_contactmethods');
+add_filter('acf/load_field/name=full_name', 'disable_acf_load_field');
+add_filter('acf/load_field/name=amount', 'disable_acf_load_field');
+add_filter('acf/load_field/name=refill', 'disable_acf_load_field');
+add_filter('acf/load_field/name=rate', 'disable_acf_load_field');
+add_filter('acf/load_field/name=period', 'disable_acf_load_field');
+add_filter('acf/prepare_field', 'hide_fields');
+
+function hide_fields ($field) {
+    $deposit_open = get_field('deposit_open');
+    if ( ( $field['_name'] == 'deposit_opened' &&  empty($deposit_open) ) ||
+         ($field['_name'] == 'close_deposit_date' &&  empty($deposit_open))  ||
+         ($field['_name'] == 'deposit_open' && !empty($deposit_open)) )
+       {
+        return false;
+    }
+  return $field;
+}
+
+function disable_acf_load_field( $field ) {
+    $field['disabled'] = 1;
+    return $field;
+}
 
 function my_user_contactmethods($user_contactmethods){
 
@@ -485,6 +603,7 @@ function my_user_contactmethods($user_contactmethods){
   $user_contactmethods['pass_whom']     = 'Кем выдан';
   $user_contactmethods['pass_date']     = 'Дата выдачи';
   $user_contactmethods['pass_code']     = 'Код подразделения';
+  $user_contactmethods['user_amount']   = 'Сумма сбережений';
 
   return $user_contactmethods;
 }
@@ -592,7 +711,105 @@ function custom_post_type_review() {
 
 }
 
-add_action( 'init', 'custom_post_type_review', 0 );
+add_action( 'init', 'custom_post_type_deposit', 0 );
+
+function custom_post_type_deposit() {
+
+    $labels = array(
+
+        'name'                  => _x( 'Вклады', 'Post Type General Name', 'victory' ),
+
+        'singular_name'         => _x( 'Вклады', 'Post Type Singular Name', 'victory' ),
+
+        'menu_name'             => __( 'Вклады', 'victory' ),
+
+        'name_admin_bar'        => __( 'Вклады', 'victory' ),
+
+        'archives'              => __( 'Архив Вкладов', 'victory' ),
+
+        'parent_item_colon'     => __( 'Родительский Элемент:', 'victory' ),
+
+        'all_items'             => __( 'Все Вклады', 'victory' ),
+
+        'add_new_item'          => __( 'Добавить Новый Вклад', 'victory' ),
+
+        'add_new'               => __( 'Добавить Новый', 'victory' ),
+
+        'new_item'              => __( 'Новый Вклад', 'victory' ),
+
+        'edit_item'             => __( 'Редактировать Вклад', 'victory' ),
+
+        'update_item'           => __( 'Обновить Вклад', 'victory' ),
+
+        'view_item'             => __( 'Посмотреть Вклад', 'victory' ),
+
+        'search_items'          => __( 'Поиск Вклада', 'victory' ),
+
+        'not_found'             => __( 'Не Найдено', 'victory' ),
+
+        'not_found_in_trash'    => __( 'Не найдено в корзине', 'victory' ),
+
+        'featured_image'        => __( 'Избранное Изображение', 'victory' ),
+
+        'set_featured_image'    => __( 'Установить Избранное Изображение', 'victory' ),
+
+        'remove_featured_image' => __( 'Удалить Избранное Изображение', 'victory' ),
+
+        'use_featured_image'    => __( 'Использовать как Избранное Изображение', 'victory' ),
+
+        'insert_into_item'      => __( 'Вставить в Вклад', 'victory' ),
+
+        'uploaded_to_this_item' => __( 'Загружено в этот Вклад', 'victory' ),
+
+        'items_list'            => __( 'Список Вкладов', 'victory' ),
+
+        'items_list_navigation' => __( 'Управление списком Вкладов', 'victory' ),
+
+        'filter_items_list'     => __( 'Филтьр списка Вкладов', 'victory' ),
+
+    );
+
+    $args = array(
+
+        'label'                 => __( 'Вклады', 'victory' ),
+
+        'description'           => __( 'Post Type Description', 'victory' ),
+
+        'labels'                => $labels,
+
+        'supports'              => array( 'title'),
+
+        'hierarchical'          => false,
+
+        'public'                => true,
+
+        'show_ui'               => true,
+
+        'show_in_menu'          => true,
+
+        'menu_position'         => 5,
+
+        'show_in_admin_bar'     => true,
+
+        'show_in_nav_menus'     => true,
+
+        'can_export'            => true,
+
+        'has_archive'           => true,
+
+        'exclude_from_search'   => false,
+
+        'publicly_queryable'    => true,
+
+        'capability_type'       => 'page',
+
+    );
+
+    register_post_type( 'deposit', $args );
+
+}
+
+add_action( 'init', 'custom_post_type_deposit', 0 );
 
 /////// If admin create the menu
 
