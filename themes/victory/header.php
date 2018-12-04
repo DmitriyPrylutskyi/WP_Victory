@@ -40,7 +40,7 @@ $phone = get_option('phone_options');
                 </div>
                 <a href="<?php echo home_url(); ?>" class="logo">
                     <p>Победа</p>
-                    <span>потребительский корпоратив</span>
+                    <span>потребительский кооператив</span>
                 </a>
 				<?php victory_nav(); ?>
             </div>
