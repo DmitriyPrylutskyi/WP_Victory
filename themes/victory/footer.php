@@ -198,7 +198,7 @@ $phone = get_option('phone_options');
                     <input type="text" placeholder="Телефон" name="phone" id="phone" required>
                     <div class="seee-pass">
                         <input type="password" placeholder="Пароль" name="password" id="password" required>
-                        <input type="checkbox" id="see-pass" onclick="showPass()"><label for="see-pass"><span></span></label>
+                        <input type="checkbox" id="see-pass"><label for="see-pass"><span></span></label>
                     </div>
                     <div class="be-cen">
                         <input type="checkbox" id="ireadd" required>
