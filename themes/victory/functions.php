@@ -164,10 +164,28 @@ function my_css_attributes_filter($var)
     return is_array($var) ? array() : '';
 }
 
-// Remove invalid rel attribute values in the categorylist
-function remove_category_rel_from_category_list($thelist)
+// Create 40 Word Callback for Custom Post Excerpts, call using html5wp_excerpt('html5wp_custom_post');
+function html_length_post()
 {
-    return str_replace('rel="category tag"', 'rel="tag"', $thelist);
+    return 40;
+}
+
+// Create the Custom Excerpts callback
+function html_excerpt_post($length_callback = '', $more_callback = '')
+{
+    global $post;
+    if (function_exists($length_callback)) {
+        add_filter('excerpt_length', $length_callback);
+    }
+    add_filter('excerpt_more', function( $more_callback) {
+        return ' ...';
+    });
+
+    $output = get_the_excerpt();
+    $output = apply_filters('wptexturize', $output);
+    $output = apply_filters('convert_chars', $output);
+    $output = '<p>' . $output . '</p>';
+    return $output;
 }
 
 // Add page slug to body class
@@ -227,7 +245,6 @@ function enqueue_admin()
 // Create the Custom Excerpts callback
 function the_excerpt_max_charlength( $string, $charlength ){
     $charlength++;
-
     if ( mb_strlen( $string ) > $charlength ) {
         $subex = mb_substr( $string, 0, $charlength - 3 );
         $exwords = explode( ' ', $subex );
@@ -238,9 +255,7 @@ function the_excerpt_max_charlength( $string, $charlength ){
             $output;
         }
         $output .= '...';
-
         return $output;
-
     } else {
         return $string;
     }
@@ -501,6 +516,180 @@ function conditional_logic() {
     <?php
 }
 
+function pagination_news($posts_per_page, $page = 0)
+{
+    global $news;
+
+    $i = 0;
+    $count = $news->found_posts;
+
+    /** Stop execution if there's only 1 page */
+    if( $count <= $posts_per_page ) {
+        return;
+    }
+
+    while ( $i + 1 <= ceil( $count / $posts_per_page ) ) {
+        $links[] = (string)($i*$posts_per_page + 1);
+        $i++;
+    }
+
+    $paginationString = '';
+
+    $paginationString .= '<div class="container"><div class="row"><div class="pagination"><ul>' . "\n";
+
+    sort( $links );
+    foreach ( (array) $links as  $key =>$link ) {
+        $class = $page == $key ? ' class="active"' : ' class="not-active"';
+        $paginationString .= sprintf( '<li%s page="' . $key . '"><a>%s</a></li>' . "\n", $class, $key+1 );
+    }
+
+    $paginationString .= '</ul></div></div></div>' . "\n";
+
+    return $paginationString;
+}
+
+function pagination($posts_per_page, $page = 0)
+{
+    global $news;
+
+    $i = 0;
+    $count = $news->found_posts;
+
+    /** Stop execution if there's only 1 page */
+    if( $count <= $posts_per_page )
+        return;
+
+    while ( $i + 1 <= ceil( $count / $posts_per_page ) ) {
+        $links[] = (string)($i*$posts_per_page + 1);
+        $i++;
+    }
+
+    $paginationString = '';
+
+    $paginationString .= '<div class="container"><div class="row"><div class="pagination"><ul>' . "\n";
+
+    sort( $links );
+    foreach ( (array) $links as  $key =>$link ) {
+        $class = $page == $key ? ' class="active"' : ' class="not-active"';
+        $paginationString .= sprintf( '<li%s page="' . $key . '"><a>%s</a></li>' . "\n", $class, $key+1 );
+    }
+
+    $paginationString .= '</ul></div></div></div>' . "\n";
+    return $paginationString;
+}
+
+$perPageNews = 3;
+
+function paginationNews() {
+    global $news;
+    global $post;
+    global $perPageNews;
+
+    $page = $_POST['page'];
+
+    $args = array(
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'post_type'      => 'post',
+        'posts_per_page' => $perPageNews,
+        'offset'         => $page * $perPageNews,
+    );
+
+    $news = new WP_Query( $args );
+    $news_out = '';
+
+    while ( $news->have_posts() ) {
+        $news->the_post();
+
+        $news_out .='<section class="reviews">';
+        $news_out .='<div class="container">';
+        $news_out .='<div class="row">';
+        $news_out .='<div class="col-12">';
+        $news_out .='<div class="wrapper-block">';
+        $news_out .='<div class="wrapper2">';
+        $news_out .='<div class="">';
+        $news_out .='<div class="review">';
+        $news_out .='<div class="photo">';
+        $news_out .='<a href="" data-toggle="modal" data-target="#watch-news">';
+        if ( get_the_post_thumbnail_url() ) {
+            $news_out .= '<img src="' . get_the_post_thumbnail_url() . '" alt="photo">';
+        }
+        $news_out .='</a>';
+        $news_out .='</div>';
+        $news_out .='<h4>';
+        $news_out .='<a href=""  data-toggle="modal" data-target="#watch-news">'. get_the_title() .'</a>';
+        $news_out .='</h4>';
+        $news_out .= html_excerpt_post('html_length_post');
+        $news_out .='<div class="clean"></div>';
+        $news_out .='</div>';
+        $news_out .='<div class="clean"></div>';
+        $news_out .='<div class="bot-trans">';
+        $news_out .='<span>';
+        $news_out .= get_the_date();
+        $news_out .= '</span>';
+        $news_out .= '<a href="#" data-toggle="modal" data-target="#watch-news" class="link-review">Читать далее</a>';
+        $news_out .= '</div>';
+        $news_out .= '<div class="clean"></div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '<div class="modal fade" id="watch-news" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">';
+        $news_out .= '<div class="modal-dialog news modal-dialog-centered" role="document">';
+        $news_out .= '<div class="modal-content">';
+        $news_out .= '<div class="modal-body">';
+        $news_out .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+        $news_out .= '<img src="' . get_template_directory_uri() . '/img/close-modal.png" alt="close-modal">';
+        $news_out .= '</button>';
+        $news_out .= '<span class="data-news">' . get_the_date() .'</span>';
+        $news_out .= '<div>';
+        $news_out .= '<div class="all-w-bl-with">';
+        $news_out .= '<div class="name">';
+        $news_out .= '<p>';
+        $news_out .= get_the_title();
+        $news_out .= '</p>';
+        $news_out .= '</div>';
+        $news_out .= '<div class="img">';
+        if ( get_the_post_thumbnail_url() ){
+             $news_out .= '<img src="' . get_the_post_thumbnail_url() .'" alt="">';
+        }
+        $news_out .= '</div>';
+        $news_out .= '<div class="bot-has-row"><a href=""><span class="left"><i class="fas fa-chevron-left"></i></span></a><a href=""><span class="right"><i class="fas fa-chevron-right"></i></span></a></div>';
+        $news_out .= '<div class="clean"></div>';
+        $news_out .= '</div>';
+        $news_out .= '<div class="text-info-has">';
+        $news_out .= get_the_content();
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</div>';
+        $news_out .= '</section>';
+    }
+
+
+
+    $news_out .= '</div></div></div></section>';
+
+    $news_out .= pagination($perPageNews, $page );
+
+    $news_out .= '</div></div>';
+
+    wp_reset_query();
+
+    if(!empty($news_out)){
+        $json['success'] = 1;
+        $json['news'] = $news_out;
+    }else{
+        $json['success'] = 0;
+    }
+    echo json_encode($json);
+    die();
+}
+
 /**
 
 /*------------------------------------*\
@@ -516,6 +705,8 @@ add_action( 'admin_enqueue_scripts', function(){
 add_action('init', 'victory_header_scripts'); // Add Custom Scripts to wp_head
 add_action('wp_enqueue_scripts', 'victory_styles'); // Add Theme Stylesheet
 add_action('init', 'register_html5_menu'); // Add HTML5 Blank Menu
+add_action('init', 'pagination_news');
+add_action('init', 'pagination'); // Add our Range Pagination
 add_action('wp_logout','victory_go_home');
 add_action('user_register', 'auto_login_new_user');
 add_action('show_user_profile', 'show_extra_profile_fields');
@@ -533,6 +724,9 @@ add_action('edit_user_profile_update', 'save_additional_user_meta');
 add_action('admin_init', 'getRoleUserUploadFile');
 add_action('acf/save_post' , 'update_post');
 add_action('admin_head', 'conditional_logic');
+// paginationNews on click
+add_action('wp_ajax_paginationNews', 'paginationNews');
+add_action('wp_ajax_nopriv_paginationNews', 'paginationNews');
 
 // Remove Actions
 remove_action('wp_head', 'feed_links_extra', 3); // Display the links to the extra feeds such as category feeds
@@ -556,7 +750,6 @@ add_filter('body_class', 'add_slug_to_body_class'); // Add slug to body class (S
 add_filter('widget_text', 'do_shortcode'); // Allow shortcodes in Dynamic Sidebar
 add_filter('widget_text', 'shortcode_unautop'); // Remove <p> tags in Dynamic Sidebars (better!)
 add_filter('wp_nav_menu_args', 'my_wp_nav_menu_args'); // Remove surrounding <div> from WP Navigation
-add_filter('the_category', 'remove_category_rel_from_category_list'); // Remove invalid rel attribute
 add_filter('the_excerpt', 'shortcode_unautop'); // Remove auto <p> tags in Excerpt (Manual Excerpts only)
 add_filter('the_excerpt', 'do_shortcode'); // Allows Shortcodes to be executed in Excerpt (Manual do_shortcodes only)
 add_filter('show_admin_bar', 'remove_admin_bar'); // Remove Admin bar
