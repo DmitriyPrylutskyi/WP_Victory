@@ -93,13 +93,16 @@ function victory_header_scripts()
         wp_register_script('slickscripts', get_template_directory_uri() . '/libs/slick/slick.min.js', array('jquery-3.3.1'), '1.8.0'); // Slick scripts
         wp_enqueue_script('slickscripts');
 
+        wp_register_script('fancyboxscripts', 'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.js', array('jquery-3.3.1'), '3.5.2'); // Fancybox scripts
+        wp_enqueue_script('fancyboxscripts');
 
         wp_register_script('victory-scripts', get_template_directory_uri() . '/js/index.js', array('jquery-3.3.1'), '1.0.0'); // Custom scripts
         wp_enqueue_script('victory-scripts'); // Enqueue it!
 
         wp_localize_script('victory-scripts', 'vars',
             array(
-                'admin_url' =>  get_admin_url()
+                'admin_url' =>  get_admin_url(),
+                'news_url'  => get_template_directory_uri()
             )
         );
 
@@ -119,6 +122,9 @@ function victory_styles()
 
     wp_register_style('slick', get_template_directory_uri() . '/libs/slick/slick.css', array(), '1.8.0', 'all');
     wp_enqueue_style('slick'); // Enqueue it!
+
+    wp_register_style('fancybox', 'https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.2/dist/jquery.fancybox.min.css', array(), '3.5.2', 'all');
+    wp_enqueue_style('fancybox'); // Enqueue it!
 
     wp_register_style('fontawesome', 'https://use.fontawesome.com/releases/v5.5.0/css/all.css', array(), '5.5.0', 'all');
     wp_enqueue_style('fontawesome'); // Enqueue it!
@@ -582,7 +588,6 @@ $perPageNews = 3;
 
 function paginationNews() {
     global $news;
-    global $post;
     global $perPageNews;
 
     $page = $_POST['page'];
@@ -690,6 +695,42 @@ function paginationNews() {
     die();
 }
 
+function change_post_menu_label() {
+    global $menu, $submenu;
+    $menu[5][0] = 'Новости';
+    $submenu['edit.php'][5][0] = 'Новости';
+    $submenu['edit.php'][10][0] = 'Добавить новость';
+    $submenu['edit.php'][16][0] = 'Новостные метки';
+    echo '';
+}
+
+function change_post_object_label() {
+    global $wp_post_types;
+    $labels = &$wp_post_types['post']->labels;
+    $labels->name = 'Новости';
+    $labels->singular_name = 'Новости';
+    $labels->add_new = 'Добавить новость';
+    $labels->add_new_item = 'Добавить новость';
+    $labels->edit_item = 'Редактировать новость';
+    $labels->new_item = 'Добавить новость';
+    $labels->view_item = 'Посмотреть новость';
+    $labels->search_items = 'Найти новость';
+    $labels->not_found = 'Не найдено';
+    $labels->not_found_in_trash = 'Корзина пуста';
+}
+
+if( wp_doing_ajax() ){
+    add_action( 'wp_ajax_nopriv_victory_ajax_return_post', 'victory_ajax_return_post' );
+    add_action( 'wp_ajax_victory_ajax_return_post', 'victory_ajax_return_post' );
+}
+
+function victory_ajax_return_post() {
+    global $post;
+    $post = get_post($_POST['post'], OBJECT );
+    setup_postdata( $post );
+    //var_dump($post);
+}
+
 /**
 
 /*------------------------------------*\
@@ -707,6 +748,8 @@ add_action('wp_enqueue_scripts', 'victory_styles'); // Add Theme Stylesheet
 add_action('init', 'register_html5_menu'); // Add HTML5 Blank Menu
 add_action('init', 'pagination_news');
 add_action('init', 'pagination'); // Add our Range Pagination
+add_action( 'init', 'change_post_object_label' ); // Rename Posts
+add_action( 'admin_menu', 'change_post_menu_label' ); // Rename Posts
 add_action('wp_logout','victory_go_home');
 add_action('user_register', 'auto_login_new_user');
 add_action('show_user_profile', 'show_extra_profile_fields');
@@ -767,7 +810,19 @@ add_filter('acf/load_field/name=amount', 'disable_acf_load_field');
 add_filter('acf/load_field/name=refill', 'disable_acf_load_field');
 add_filter('acf/load_field/name=rate', 'disable_acf_load_field');
 add_filter('acf/load_field/name=period', 'disable_acf_load_field');
+add_filter('acf/load_field/name=order_type', 'disable_acf_load_field');
+add_filter('acf/load_field/name=order_name', 'disable_acf_load_field');
+add_filter('acf/load_field/name=order_phone', 'disable_acf_load_field');
+add_filter('acf/load_field/name=order_date', 'disable_acf_load_field');
+add_filter('acf/load_field/name=order_comment', 'disable_acf_load_field');
 add_filter('acf/prepare_field', 'hide_fields');
+add_filter('gettext',  'change_post_name');
+add_filter('ngettext',  'change_post_name');
+
+function change_post_name( $translated ) {
+    $translated = str_ireplace(  'Записи',  'Новости',  $translated );
+    return $translated;
+}
 
 function hide_fields ($field) {
     $deposit_open = get_field('deposit_open');
@@ -904,7 +959,7 @@ function custom_post_type_review() {
 
 }
 
-add_action( 'init', 'custom_post_type_deposit', 0 );
+add_action( 'init', 'custom_post_type_review', 0 );
 
 function custom_post_type_deposit() {
 
@@ -1003,6 +1058,202 @@ function custom_post_type_deposit() {
 }
 
 add_action( 'init', 'custom_post_type_deposit', 0 );
+
+function custom_post_type_service() {
+
+    $labels = array(
+
+        'name'                  => _x( 'Заказы', 'Post Type General Name', 'victory' ),
+
+        'singular_name'         => _x( 'Заказы', 'Post Type Singular Name', 'victory' ),
+
+        'menu_name'             => __( 'Заказы', 'victory' ),
+
+        'name_admin_bar'        => __( 'Заказы', 'victory' ),
+
+        'archives'              => __( 'Архив Заказов', 'victory' ),
+
+        'parent_item_colon'     => __( 'Родительский Элемент:', 'victory' ),
+
+        'all_items'             => __( 'Все Заказы', 'victory' ),
+
+        'add_new_item'          => __( 'Добавить Новый Заказ', 'victory' ),
+
+        'add_new'               => __( 'Добавить Новый', 'victory' ),
+
+        'new_item'              => __( 'Новый Заказ', 'victory' ),
+
+        'edit_item'             => __( 'Редактировать Заказ', 'victory' ),
+
+        'update_item'           => __( 'Обновить Заказ', 'victory' ),
+
+        'view_item'             => __( 'Посмотреть Заказ', 'victory' ),
+
+        'search_items'          => __( 'Поиск Заказа', 'victory' ),
+
+        'not_found'             => __( 'Не Найдено', 'victory' ),
+
+        'not_found_in_trash'    => __( 'Не найдено в корзине', 'victory' ),
+
+        'featured_image'        => __( 'Избранное Изображение', 'victory' ),
+
+        'set_featured_image'    => __( 'Установить Избранное Изображение', 'victory' ),
+
+        'remove_featured_image' => __( 'Удалить Избранное Изображение', 'victory' ),
+
+        'use_featured_image'    => __( 'Использовать как Избранное Изображение', 'victory' ),
+
+        'insert_into_item'      => __( 'Вставить в Заказ', 'victory' ),
+
+        'uploaded_to_this_item' => __( 'Загружено в этот Заказ', 'victory' ),
+
+        'items_list'            => __( 'Список Заказов', 'victory' ),
+
+        'items_list_navigation' => __( 'Управление списком Заказов', 'victory' ),
+
+        'filter_items_list'     => __( 'Филтьр списка Заказов', 'victory' ),
+
+    );
+
+    $args = array(
+
+        'label'                 => __( 'Заказы', 'victory' ),
+
+        'description'           => __( 'Post Type Description', 'victory' ),
+
+        'labels'                => $labels,
+
+        'supports'              => array( 'title'),
+
+        'hierarchical'          => false,
+
+        'public'                => true,
+
+        'show_ui'               => true,
+
+        'show_in_menu'          => true,
+
+        'menu_position'         => 5,
+
+        'show_in_admin_bar'     => true,
+
+        'show_in_nav_menus'     => true,
+
+        'can_export'            => true,
+
+        'has_archive'           => true,
+
+        'exclude_from_search'   => false,
+
+        'publicly_queryable'    => true,
+
+        'capability_type'       => 'page',
+
+    );
+
+    register_post_type( 'service', $args );
+
+}
+
+add_action( 'init', 'custom_post_type_service', 0 );
+
+function custom_post_type_equipment() {
+
+    $labels = array(
+
+        'name'                  => _x( 'Спецтехника', 'Post Type General Name', 'victory' ),
+
+        'singular_name'         => _x( 'Спецтехника', 'Post Type Singular Name', 'victory' ),
+
+        'menu_name'             => __( 'Спецтехника', 'victory' ),
+
+        'name_admin_bar'        => __( 'Спецтехника', 'victory' ),
+
+        'archives'              => __( 'Архив Спецтехники', 'victory' ),
+
+        'parent_item_colon'     => __( 'Родительский Элемент:', 'victory' ),
+
+        'all_items'             => __( 'Вся Спецтехника', 'victory' ),
+
+        'add_new_item'          => __( 'Добавить Новую Спецтехнику', 'victory' ),
+
+        'add_new'               => __( 'Добавить Новую', 'victory' ),
+
+        'new_item'              => __( 'Новая Спецтехника', 'victory' ),
+
+        'edit_item'             => __( 'Редактировать Спецтехнику', 'victory' ),
+
+        'update_item'           => __( 'Обновить Спецтехнику', 'victory' ),
+
+        'view_item'             => __( 'Посмотреть Спецтехнику', 'victory' ),
+
+        'search_items'          => __( 'Поиск Спецтехники', 'victory' ),
+
+        'not_found'             => __( 'Не Найдено', 'victory' ),
+
+        'not_found_in_trash'    => __( 'Не найдено в корзине', 'victory' ),
+
+        'featured_image'        => __( 'Избранное Изображение', 'victory' ),
+
+        'set_featured_image'    => __( 'Установить Избранное Изображение', 'victory' ),
+
+        'remove_featured_image' => __( 'Удалить Избранное Изображение', 'victory' ),
+
+        'use_featured_image'    => __( 'Использовать как Избранное Изображение', 'victory' ),
+
+        'insert_into_item'      => __( 'Вставить в Спецтехнику', 'victory' ),
+
+        'uploaded_to_this_item' => __( 'Загружено в эту Спецтехнику', 'victory' ),
+
+        'items_list'            => __( 'Список Спецтехники', 'victory' ),
+
+        'items_list_navigation' => __( 'Управление списком Спецтехники', 'victory' ),
+
+        'filter_items_list'     => __( 'Филтьр списка Спецтехники', 'victory' ),
+
+    );
+
+    $args = array(
+
+        'label'                 => __( 'Спецтехника', 'victory' ),
+
+        'description'           => __( 'Post Type Description', 'victory' ),
+
+        'labels'                => $labels,
+
+        'supports'              => array( 'title'),
+
+        'hierarchical'          => false,
+
+        'public'                => true,
+
+        'show_ui'               => true,
+
+        'show_in_menu'          => true,
+
+        'menu_position'         => 5,
+
+        'show_in_admin_bar'     => true,
+
+        'show_in_nav_menus'     => true,
+
+        'can_export'            => true,
+
+        'has_archive'           => true,
+
+        'exclude_from_search'   => false,
+
+        'publicly_queryable'    => true,
+
+        'capability_type'       => 'page',
+
+    );
+
+    register_post_type( 'equipment', $args );
+
+}
+
+add_action( 'init', 'custom_post_type_equipment', 0 );
 
 /////// If admin create the menu
 

@@ -1,6 +1,8 @@
 <?php
 function theme_options_page(){
     // variables for the field and option names
+    $address_name = 'address_options';
+    $address_field_name = 'Адрес';
     $email_name = 'email_options';
     $email_field_name = 'Email';
     $phone_name = 'phone_options';
@@ -18,6 +20,7 @@ function theme_options_page(){
     $hidden_field_name = 'vicory_submit_hidden';
 
     // Read in existing option value from database
+    $address_val = get_option( $address_name );
     $email_val = get_option( $email_name );
     $phone_val = get_option( $phone_name );
     $rate_3_val = get_option( $rate_3_name );
@@ -30,6 +33,7 @@ function theme_options_page(){
     // If they did, this hidden field will be set to 'Y'
     if( $_POST[ $hidden_field_name ] == 'Y' ) {
         // Read their posted value
+        $opt_address = $address_val = $_POST[ $address_name ];
         $opt_email = $email_val = $_POST[ $email_name ];
         $opt_phone = $phone_val = $_POST[ $phone_name ];
         $opt_rate_3  = $rate_3_val = $_POST[ $rate_3_name ];
@@ -39,6 +43,7 @@ function theme_options_page(){
         $opt_rate_termless  = $rate_termless_val = $_POST[ $rate_termless_name ];
 
         // Save the posted value in the database
+        update_option( $address_name, $opt_address );
         update_option( $email_name, $opt_email );
         update_option( $phone_name, $opt_phone );
         update_option( $rate_3_name, $opt_rate_3 );
@@ -64,6 +69,12 @@ function theme_options_page(){
         <form method="post" enctype="multipart/form-data" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
             <table class="form-table">
                 <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label for="<?php echo address_name; ?>"><?php echo $address_field_name; ?></label>
+                        </th>
+                        <td><input name="<?php echo $address_name; ?>" type="text" id="<?php echo $address_name; ?>" value="<?php echo $address_val; ?>" class='regular-text'></td>
+                    </tr>
                     <tr>
                         <th scope="row">
                             <label for="<?php echo $email_name; ?>"><?php echo $email_field_name; ?></label>

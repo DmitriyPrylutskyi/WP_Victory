@@ -1,13 +1,9 @@
-<?php get_header(); ?>
+<?php
 
-	<main role="main">
-		<!-- section -->
-		<section>
+get_header();
 
-			<?php get_template_part('loop'); ?>
+	get_template_part( 'template-service-inner');
 
-		</section>
-		<!-- /section -->
-	</main>
+get_footer();
 
-<?php get_footer(); ?>
+?>

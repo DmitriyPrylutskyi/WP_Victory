@@ -528,7 +528,7 @@ if( !function_exists('victory_ajax_add_deposit') ) {
         }
 
         if ($refill==''){
-             print ('Поле Сумыы Ежемесячного пополнения пустое!');
+            print ('Поле Сумыы Ежемесячного пополнения пустое!');
             exit();
         }
 
@@ -553,6 +553,75 @@ if( !function_exists('victory_ajax_add_deposit') ) {
             update_field( 'period' , $period, $post_id );
 
             print ('Заявка отправлена');
+        } else {
+            print ('Повторите попытку позже');
+        }
+
+        wp_reset_query();
+
+        die();
+
+    }
+}
+
+/// Add Order function
+
+if( wp_doing_ajax() ){
+    add_action( 'wp_ajax_nopriv_victory_ajax_add_order', 'victory_ajax_add_order' );
+    add_action( 'wp_ajax_victory_ajax_add_order', 'victory_ajax_add_order' );
+}
+
+if( !function_exists('victory_ajax_add_order') ) {
+
+    function victory_ajax_add_order(){
+        $allowed_html   = array();
+
+        $order_type       =   trim( wp_kses ($_POST['order_type'],$allowed_html ));
+        $order_name       =   trim( wp_kses ($_POST['order_name'],$allowed_html ));
+        $order_phone      =   trim( wp_kses ($_POST['order_phone'],$allowed_html ));
+        $order_date       =   trim( wp_kses ($_POST['order_date'],$allowed_html ));
+        $order_comment    =   trim( wp_kses ($_POST['order_comment'],$allowed_html ));
+
+        if( !verify_onetime_nonce($_POST['nonce'], 'order_nonce') ){
+            print ('Что-то пошло не так. Повторите позже.');
+            exit();
+        }
+
+        if ($order_name==''){
+            print ('Поле Имя пустое!');
+            exit();
+        }
+
+        if ($order_phone==''){
+            print ('Поле Телефон пустое!');
+            exit();
+        }
+
+        if ($order_date==''){
+            print ('Поле Даты пустое!');
+            exit();
+        }
+
+        $post = array(
+            'post_status'   => 'publish',
+            'post_type'     => 'service'
+        );
+        $post_id =  wp_insert_post($post );
+
+        if($post_id) {
+            $arg = array(
+                'ID' => $post_id,
+                'post_title' => 'Заказ № ' .  $post_id
+            );
+            wp_update_post( wp_slash($arg) );
+
+            update_field( 'order_type' , $order_type, $post_id );
+            update_field( 'order_name' , $order_name, $post_id );
+            update_field( 'order_phone' , $order_phone, $post_id );
+            update_field( 'order_date' , $order_date, $post_id );
+            update_field( 'order_comment' , $order_comment, $post_id );
+
+            print ('Заказ отправлен');
         } else {
             print ('Повторите попытку позже');
         }

@@ -18,7 +18,7 @@ $phone = get_option('phone_options');
             <div class="col-12 col-md-6">
                 <a href="#" class="logo">
                     <p>Победа</p>
-                    <span>потребительский корпоратив</span>
+                    <span>потребительский кооператив</span>
                 </a>
             </div>
             <div class="col-12 col-md-6 contacts">
@@ -303,12 +303,15 @@ $phone = get_option('phone_options');
                     <img src="<?php echo get_template_directory_uri(); ?>/img/close-modal.png" alt="close-modal">
                 </button>
                 <h3>оформить заказ</h3>
-                <form>
-                    <input type="text" placeholder="ФИО" name="fio">
-                    <input type="text" placeholder="Телефон" name="phone">
-                    <input type="text" placeholder="Дата" name="data">
-                    <textarea name="" id="" placeholder="Комментарий"></textarea>
-                    <input type="submit" value="Отправить">
+                <div id="order_info_message"></div>
+                <form id="form-order">
+                    <input type="hidden" name="order-type" id="order-type" value="">
+                    <input type="text" name="order-name" id="order-name" placeholder="ФИО">
+                    <input type="text" name="order-phone" id="order-phone" placeholder="Телефон">
+                    <input type="text" name="order-date" id="order-date" placeholder="Дата">
+                    <textarea name="order-comment" id="order-comment" placeholder="Комментарий"></textarea>
+                    <input type="hidden" id="security-order" name="security-order" value="<?php echo create_onetime_nonce( 'order_nonce' ); ?>">
+                    <input type="button" id="victory-order" value="Отправить">
                 </form>
             </div>
         </div>

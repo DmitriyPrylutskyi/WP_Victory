@@ -33,17 +33,15 @@ $news = new WP_Query( $args );
                 <div class="">
                     <div class="review">
                         <div class="photo">
-                            <a href="" data-toggle="modal" data-target="#watch-news">
+                            <a href="" data-toggle="modal" data-target="#watch-news"  data-post="<?php echo $post->ID; ?>">
                                 <?php if ( get_the_post_thumbnail_url() ) :?>
                                     <img src="<?php echo get_the_post_thumbnail_url(); ?>" alt="photo">
                                 <?php endif; ?>
                             </a>
                         </div>
                         <h4>
-                            <a href=""  data-toggle="modal" data-target="#watch-news"><?php echo get_the_title(); ?></a>
-
+                            <a href=""  data-toggle="modal" data-target="#watch-news" data-post="<?php echo $post->ID; ?>"><?php echo get_the_title(); ?></a>
                         </h4>
-
                         <?php echo html_excerpt_post('html_length_post'); ?>
                         <div class="clean"></div>
                     </div>
@@ -52,7 +50,7 @@ $news = new WP_Query( $args );
                             <span>
                                 <?php echo get_the_date(); ?>
                             </span>
-                        <a href="#" data-toggle="modal" data-target="#watch-news" class="link-review">
+                        <a href="#" data-toggle="modal" data-target="#watch-news"  data-post="<?php echo $post->ID; ?>" class="link-review">
                             Читать далее
                         </a>
                     </div>
@@ -65,6 +63,12 @@ $news = new WP_Query( $args );
             <div class="modal-dialog news modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
+                        <?php
+                            global $post;
+                            $post = get_post($_POST['post'], OBJECT );
+                            setup_postdata( $post );
+                            var_dump($_POST['post']);
+                        ?>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <img src="<?php echo get_template_directory_uri(); ?>/img/close-modal.png" alt="close-modal">
                         </button>
@@ -103,9 +107,22 @@ $news = new WP_Query( $args );
 
         <?php echo pagination_news($perPageNews, 0 ); ?>
 
-        <?php wp_reset_query(); ?>
+        <?php
+            //wp_reset_postdata();
+            wp_reset_query();
+        ?>
 
         </div>
     </div>
 
 <?php get_footer(); ?>
+
+<script>
+    $('a[data-target="#watch-news"]').click(function () {
+        //ajaxurl = vars.admin_url + 'admin-ajax.php';
+        url =  vars.news_url + '/template-news.php';
+        console.log(url);
+        post = $(this).attr('data-post');
+        $.post(url, {post : post})
+    });
+</script>

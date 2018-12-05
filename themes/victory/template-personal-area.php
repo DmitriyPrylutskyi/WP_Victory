@@ -427,7 +427,7 @@ wp_enqueue_style('thickbox');
 
                                                                 $deposit_opened = get_field('deposit_opened');
                                                                 $close_deposit_date = get_field('close_deposit_date');
-                                                                 $period = get_field('period');
+                                                                $period = get_field('period');
                                                                 $amount = get_field('amount');
                                                                 $refill = get_field('refill');
                                                                 $rate = get_field('rate');
