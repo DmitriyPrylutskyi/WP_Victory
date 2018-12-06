@@ -15,16 +15,19 @@ $phone = get_option('phone_options');
 <footer>
     <div class="container">
         <div class="row">
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-3">
                 <a href="#" class="logo">
                     <p>Победа</p>
                     <span>потребительский кооператив</span>
                 </a>
             </div>
-            <div class="col-12 col-md-6 contacts">
+            <div class="col-12 col-md-9 contacts">
+                <span>Email: </span>
                 <a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a>
-                <span>Телефон горячей линии</span>
+                <span>Телефон горячей линии: </span>
                 <a href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a>
+                <span>ИНН: 7728439614 </span>
+                <span>ОГРН: 1187746738190</span>
             </div>
         </div>
     </div>
@@ -200,11 +203,11 @@ $phone = get_option('phone_options');
                         <input type="password" placeholder="Пароль" name="password" id="password" required>
                         <input type="checkbox" id="see-pass"><label for="see-pass"><span></span></label>
                     </div>
-                    <div class="be-cen">
+                    <!--<div class="be-cen">
                         <input type="checkbox" id="ireadd" required>
                         <label for="ireadd"><span></span>Я прочел и согласен с <a href="" data-toggle="modal"
                                 data-target="#leave-order" class="leave-order">Правилами и условиями</a></label>
-                    </div>
+                    </div>-->
                     <a href="" data-toggle="modal" data-target="#forgot-pass" class="forgot-pass">Забыли пароль?</a>
                     <input type="hidden" id="security-login" name="security-login" value="<?php echo create_onetime_nonce( 'login_nonce' ); ?>">
                     <div class="new-link-mod">

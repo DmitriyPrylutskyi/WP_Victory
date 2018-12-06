@@ -11,7 +11,6 @@
 
 // including some required file with shortcodes
 
-require_once get_template_directory().'/inc/shortcodes.php';
 require_once get_template_directory().'/inc/personal-area.php';
 
 /*------------------------------------*\
@@ -267,13 +266,6 @@ function the_excerpt_max_charlength( $string, $charlength ){
     }
 }
 
-if( !function_exists('victory_go_home') ):
-    function victory_go_home(){
-        wp_redirect( esc_html( home_url() ) );
-        exit();
-    }
-endif;
-
 if( !function_exists('auto_login_new_user') ):
     function auto_login_new_user( $user_id ) {
         wp_set_auth_cookie($user_id);
@@ -522,6 +514,8 @@ function conditional_logic() {
     <?php
 }
 
+$perPageNews = 3;
+
 function pagination_news($posts_per_page, $page = 0)
 {
     global $news;
@@ -554,39 +548,7 @@ function pagination_news($posts_per_page, $page = 0)
     return $paginationString;
 }
 
-function pagination($posts_per_page, $page = 0)
-{
-    global $news;
-
-    $i = 0;
-    $count = $news->found_posts;
-
-    /** Stop execution if there's only 1 page */
-    if( $count <= $posts_per_page )
-        return;
-
-    while ( $i + 1 <= ceil( $count / $posts_per_page ) ) {
-        $links[] = (string)($i*$posts_per_page + 1);
-        $i++;
-    }
-
-    $paginationString = '';
-
-    $paginationString .= '<div class="container"><div class="row"><div class="pagination"><ul>' . "\n";
-
-    sort( $links );
-    foreach ( (array) $links as  $key =>$link ) {
-        $class = $page == $key ? ' class="active"' : ' class="not-active"';
-        $paginationString .= sprintf( '<li%s page="' . $key . '"><a>%s</a></li>' . "\n", $class, $key+1 );
-    }
-
-    $paginationString .= '</ul></div></div></div>' . "\n";
-    return $paginationString;
-}
-
-$perPageNews = 3;
-
-function paginationNews() {
+function showNews() {
     global $news;
     global $perPageNews;
 
@@ -603,13 +565,14 @@ function paginationNews() {
     $news = new WP_Query( $args );
     $news_out = '';
 
+    $news_out .='<section class="reviews">';
+    $news_out .='<div class="container">';
+    $news_out .='<div class="row">';
+    $news_out .='<div class="col-12">';
+
     while ( $news->have_posts() ) {
         $news->the_post();
 
-        $news_out .='<section class="reviews">';
-        $news_out .='<div class="container">';
-        $news_out .='<div class="row">';
-        $news_out .='<div class="col-12">';
         $news_out .='<div class="wrapper-block">';
         $news_out .='<div class="wrapper2">';
         $news_out .='<div class="">';
@@ -669,17 +632,13 @@ function paginationNews() {
         $news_out .= '</div>';
         $news_out .= '</div>';
         $news_out .= '</div>';
-        $news_out .= '</div>';
-        $news_out .= '</div>';
-        $news_out .= '</div>';
-        $news_out .= '</section>';
     }
 
 
 
     $news_out .= '</div></div></div></section>';
 
-    $news_out .= pagination($perPageNews, $page );
+    $news_out .= pagination_news($perPageNews, $page );
 
     $news_out .= '</div></div>';
 
@@ -688,6 +647,119 @@ function paginationNews() {
     if(!empty($news_out)){
         $json['success'] = 1;
         $json['news'] = $news_out;
+    }else{
+        $json['success'] = 0;
+    }
+    echo json_encode($json);
+    die();
+}
+
+$perPageReviews = 3;
+
+function pagination_reviews($posts_per_page, $page = 0)
+{
+    global $reviews;
+
+    $i = 0;
+    $count = $reviews->found_posts;
+
+    /** Stop execution if there's only 1 page */
+    if( $count <= $posts_per_page ) {
+        return;
+    }
+
+    while ( $i + 1 <= ceil( $count / $posts_per_page ) ) {
+        $links[] = (string)($i*$posts_per_page + 1);
+        $i++;
+    }
+
+    $paginationString = '';
+
+    $paginationString .= '<div class="container"><div class="row"><div class="pagination"><ul>' . "\n";
+
+    sort( $links );
+    foreach ( (array) $links as  $key =>$link ) {
+        $class = $page == $key ? ' class="active"' : ' class="not-active"';
+        $paginationString .= sprintf( '<li%s page="' . $key . '"><a>%s</a></li>' . "\n", $class, $key+1 );
+    }
+
+    $paginationString .= '</ul></div></div></div>' . "\n";
+
+    return $paginationString;
+}
+
+function showReviews() {
+    global $reviews;
+    global $perPageReviews;
+
+    $page = $_POST['page'];
+
+    $args = array(
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'post_type'      => 'reviews',
+        'posts_per_page' => $perPageReviews,
+        'offset'         => $page * $perPageReviews,
+    );
+
+    $reviews = new WP_Query( $args );
+    $reviews_out = '';
+
+    $reviews_out .='<section class="reviews">';
+    $reviews_out .='<div class="container">';
+    $reviews_out .='<div class="row">';
+    $reviews_out .='<div class="col-12">';
+
+    while ( $reviews->have_posts() ) {
+        $reviews->the_post();
+
+        $user_name      = get_the_title();
+        $user_photo     = get_field('photo_review');
+        $location       = get_field('location');
+        $date_review    = (get_field('date_review') == '') ? get_the_date('j F Y') : get_field('date_review');
+        $text_review    = get_field('text_review');
+
+        $reviews_out .='<div class="wrapper-block">';
+        $reviews_out .='<div class="wrapper2">';
+        $reviews_out .='<div class="">';
+        $reviews_out .='<div class="review">';
+        $reviews_out .='<div class="photo">';
+        if ( !empty($user_photo) ) {
+            $reviews_out .= '<img src="' . $user_photo . '" alt="photo">';
+        }
+        $reviews_out .='</div>';
+        $reviews_out .='<h4>';
+        $reviews_out .= $user_name;
+        $reviews_out .='</h4>';
+        $reviews_out .='<span>';
+        $reviews_out .= $date_review;
+        $reviews_out .='</span>';
+        $reviews_out .='<h5>';
+        $reviews_out .= $location;
+        $reviews_out .='</h5>';
+        $reviews_out .='<p>';
+        $reviews_out .= $text_review;
+        $reviews_out .='</p>';
+        $reviews_out .= '</div>';
+        $reviews_out .= '</div>';
+        $reviews_out .= '</div>';
+        $reviews_out .= '</div>';
+    }
+
+    $reviews_out .= '</div>';
+    $reviews_out .= '</div>';
+    $reviews_out .= '</div>';
+    $reviews_out .= '</section>';
+
+    $reviews_out .= pagination_reviews($perPageReviews, $page );
+
+    $reviews_out .= '</div></div>';
+
+    wp_reset_query();
+
+    if(!empty($reviews_out)){
+        $json['success'] = 1;
+        $json['reviews'] = $reviews_out;
     }else{
         $json['success'] = 0;
     }
@@ -731,6 +803,16 @@ function victory_ajax_return_post() {
     //var_dump($post);
 }
 
+function logout_without_confirm($action, $result)
+{
+    if ($action == "log-out" && !isset($_GET['_wpnonce'])) {
+        $redirect_to = isset($_REQUEST['redirect_to']) ? $_REQUEST['redirect_to'] : home_url();
+        $location = str_replace('&amp;', '&', wp_logout_url($redirect_to));
+        header("Location: $location");
+        die;
+    }
+}
+
 /**
 
 /*------------------------------------*\
@@ -747,10 +829,10 @@ add_action('init', 'victory_header_scripts'); // Add Custom Scripts to wp_head
 add_action('wp_enqueue_scripts', 'victory_styles'); // Add Theme Stylesheet
 add_action('init', 'register_html5_menu'); // Add HTML5 Blank Menu
 add_action('init', 'pagination_news');
-add_action('init', 'pagination'); // Add our Range Pagination
-add_action( 'init', 'change_post_object_label' ); // Rename Posts
-add_action( 'admin_menu', 'change_post_menu_label' ); // Rename Posts
-add_action('wp_logout','victory_go_home');
+add_action('init', 'pagination_reviews');
+add_action('init', 'change_post_object_label' ); // Rename Posts
+add_action('admin_menu', 'change_post_menu_label' ); // Rename Posts
+add_action('check_admin_referer', 'logout_without_confirm', 10, 2);
 add_action('user_register', 'auto_login_new_user');
 add_action('show_user_profile', 'show_extra_profile_fields');
 add_action('edit_user_profile', 'show_extra_profile_fields');
@@ -768,8 +850,10 @@ add_action('admin_init', 'getRoleUserUploadFile');
 add_action('acf/save_post' , 'update_post');
 add_action('admin_head', 'conditional_logic');
 // paginationNews on click
-add_action('wp_ajax_paginationNews', 'paginationNews');
-add_action('wp_ajax_nopriv_paginationNews', 'paginationNews');
+add_action('wp_ajax_paginationNews', 'showNews');
+add_action('wp_ajax_nopriv_paginationNews', 'showNews');
+add_action('wp_ajax_paginationReviews', 'showReviews');
+add_action('wp_ajax_nopriv_paginationReviews', 'showReviews');
 
 // Remove Actions
 remove_action('wp_head', 'feed_links_extra', 3); // Display the links to the extra feeds such as category feeds

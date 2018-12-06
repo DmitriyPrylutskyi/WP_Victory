@@ -9,22 +9,20 @@
 
 get_header(); ?>
 
-	<div id="primary" class="content-area">
-		<main id="main" class="site-main" role="main">
+<div class="error-ar">
+    <div class="oun-head">
+        <h2>Ошибка</h2>
+    </div>
+    <div class="cen-miset">
+        <div class="some-err">
+            <p>404 <span>ошибка</span></p>
+            <span>Запрашиваемая страница не найдена!</span>
+        </div>
+    </div>
+</div>
 
-			<section class="error-404 not-found">
-				<header class="page-header">
-					<h1 class="page-title"><?php _e( 'Oops! That page can&rsquo;t be found.', 'twentyfifteen' ); ?></h1>
-				</header><!-- .page-header -->
-
-				<div class="page-content">
-					<p><?php _e( 'It looks like nothing was found at this location. Maybe try a search?', 'twentyfifteen' ); ?></p>
-
-					<?php get_search_form(); ?>
-				</div><!-- .page-content -->
-			</section><!-- .error-404 -->
-
-		</main><!-- .site-main -->
-	</div><!-- .content-area -->
+<script>
+	$("body").addClass('less-foot');
+</script>
 
 <?php get_footer(); ?>

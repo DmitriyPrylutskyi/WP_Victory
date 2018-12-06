@@ -29,7 +29,7 @@ if( have_rows('advantages') ):
                 $advantages .= '<p class="active">';
                 $advantages .= $description_short;
                 $advantages .= '</p>';
-                $advantages .= '<p class="long-text scrollbar">';
+                $advantages .= '<p class="small-text scrollbar">';
                 $advantages .= $description_long;
                 $advantages .= '</p>';
                 $advantages .= '</div>';
@@ -47,7 +47,7 @@ if( have_rows('advantages') ):
                 $advantages .= '<p class="active">';
                 $advantages .= $description_short;
                 $advantages .= '</p>';
-                $advantages .= '<p class="long-text scrollbar">';
+                $advantages .= '<p class="small-text scrollbar">';
                 $advantages .= $description_long;
                 $advantages .= '</p>';
             }
@@ -81,11 +81,6 @@ if( have_rows('liders') ):
 endif;
 
 //section reviews
-extract(shortcode_atts(array(
-    'class' => '',
-    'number' => '1',
-), $atts));
-
 
 // WP_Query arguments
 $args = array(
@@ -112,7 +107,9 @@ if ( $query->have_posts() ) {
 
         $reviews .= '<div class="review">';
         $reviews .= '<div class="photo">';
-        $reviews .= '<img src="' . $user_photo . '" alt="photo">';
+        if ( !empty($user_photo) ) {
+            $reviews .= '<img src="' . $user_photo . '" alt="photo">';
+        }
         $reviews .= '</div>';
         $reviews .= '<h4>' . $user_name . '</h4>';
         $reviews .= '<span>' . $date_review . '</span>';
@@ -122,6 +119,8 @@ if ( $query->have_posts() ) {
 
     }
 }
+
+wp_reset_query();
 
 ?>
 
@@ -195,7 +194,7 @@ if ( $query->have_posts() ) {
                             <div class="input-refill-block">
                                 <div id="slider-refill" class="slider"></div>
                                 <div class="input-refill">
-                                    <input name="refill" type="text" id="refill" value="1000">
+                                    <input name="refill" type="text" id="refill" value="0">
                                     <label for="refill">
                                         Ежемесячное пополнение
                                     </label>
@@ -246,7 +245,7 @@ if ( $query->have_posts() ) {
             <div class="row">
                 <div class="col-12 col-md-6 offset">
                     <p>
-                        Кредитный потребительский кооператив является некоммерческой организацией, который выполняет социальную миссию, предлагая населению доступные услуги финансовой взаимопомощи. Без волокиты с бумагами и справками в «ПОБЕДЕ» всегда можно сохранить свои сбережения под выгодные проценты или оформить заём на неотложные нужды. Деятельность КПК регулируется Федеральным законом «О кредитной кооперации», а контроль осуществляет Центробанк РФ, являясь мега-регулятором кредитных и некредитных организаций.
+                        Потребительский кооператив "Победа" является открытой некоммерческой организацией, которая выполняет социальную миссию, предлагая населению и юридическим лицам доступные финасовые услуги. Без волокиты с бумагами и справками в «Победе» всегда можно сохранить свои сбережения под выгодные проценты или оформить займ. Ответственность ПК "Победа" перед своими клиентами застрахована в страховом обществе "Помощь".
                     </p>
                 </div>
                 <div class="col-12 col-md-5 image">
@@ -294,7 +293,7 @@ if ( $query->have_posts() ) {
                             <div class="reviews-carousel">
                                 <?php echo $reviews; ?>
                             </div>
-                            <a href="/reviews" class="link-review">
+                            <a href="<?php echo get_permalink( get_page_by_path( 'review', OBJECT ) ); ?>" class="link-review">
                                 Перейти на страницу
                             </a>
                         </div>
@@ -306,36 +305,3 @@ if ( $query->have_posts() ) {
 </div>
 
 <?php get_footer(); ?>
-
-<script type="application/javascript">
-    function setHoverOnAdvantageIcon() {
-        $('.advantage-img').hover(
-            function() {
-              if ( !$( this ).hasClass('active') ) {
-                $( this ).find('img').toggleClass('active');
-              }
-            }, function() {
-              if ( !$( this ).hasClass('active') ) {
-                $( this ).find('img').toggleClass('active');
-              }
-            }
-        )
-    }
-
-    function setClickOnAdvantageIcon() {
-      $('.advantage-img').click(function() {
-        if ( !$( this ).hasClass('active') ) {
-            $( this ).addClass('active');
-            $( this ).parent().find('.advantage-desc p').toggleClass('active');
-        } else {
-            $( this ).removeClass('active');
-            $( this ).parent().find('.advantage-desc p').toggleClass('active');
-        }
-      })
-    }
-
-    $(window).on("load", function() {
-        setHoverOnAdvantageIcon();
-        setClickOnAdvantageIcon();
-    })
-</script>

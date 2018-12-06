@@ -301,7 +301,7 @@ wp_enqueue_style('thickbox');
                                                     <div class="input-refill-block">
                                                         <div id="slider-refill" class="slider"></div>
                                                         <div class="input-refill">
-                                                            <input name="refill" type="text" id="refill" value="1000">
+                                                            <input name="refill" type="text" id="refill" value="0">
                                                             <label for="refill">
                                                                 Ежемесячное пополнение
                                                             </label>

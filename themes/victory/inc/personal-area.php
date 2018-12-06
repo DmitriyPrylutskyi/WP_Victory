@@ -41,6 +41,11 @@ if( !function_exists('victory_ajax_register_form') ) {
             die();
         }
 
+        if (preg_match("/^[\d- ]+$/", $phone) == 0) {
+            echo json_encode(array('register'=>false,'message'=>'Некорректный номер телефона !', 'id'=>'phone'));
+            die();
+        }
+
         if ($email==''){
             echo json_encode(array('register'=>false,'message'=>'Поле почты пустое!', 'id'=>'email'));
             exit();
@@ -56,7 +61,7 @@ if( !function_exists('victory_ajax_register_form') ) {
             exit();
         }
 
-        if(filter_var($email,FvictoryILTER_VALIDATE_EMAIL) === false) {
+        if(filter_var($email,FILTER_VALIDATE_EMAIL) === false) {
             echo json_encode(array('register'=>false,'message'=>'Почта некорректная!', 'id'=>'email'));
             exit();
         }
@@ -139,7 +144,7 @@ if( !function_exists('victory_ajax_login_form') ) {
         $info                   = array();
         $info['user_login']     = $user_name;
         $info['user_password']  = $password;
-        $info['remember'] 			= true;
+        $info['remember'] 		= true;
         $user_signon            = wp_signon( $info, true );
 
         if ( is_wp_error($user_signon) ){

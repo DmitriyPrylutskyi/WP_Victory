@@ -108,7 +108,6 @@ $news = new WP_Query( $args );
         <?php echo pagination_news($perPageNews, 0 ); ?>
 
         <?php
-            //wp_reset_postdata();
             wp_reset_query();
         ?>
 
@@ -119,9 +118,7 @@ $news = new WP_Query( $args );
 
 <script>
     $('a[data-target="#watch-news"]').click(function () {
-        //ajaxurl = vars.admin_url + 'admin-ajax.php';
         url =  vars.news_url + '/template-news.php';
-        console.log(url);
         post = $(this).attr('data-post');
         $.post(url, {post : post})
     });

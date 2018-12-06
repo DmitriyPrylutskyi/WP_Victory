@@ -52,8 +52,9 @@ $phone = get_option('phone_options');
         <div class="row">
             <div class="col-12">
                 <div class="wrapper">
+                    <span>Email: </span>
                     <a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a>
-                    <span>Телефон горячей линии</span>
+                    <span>Телефон горячей линии: </span>
                     <a href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a>
                 </div>
             </div>
