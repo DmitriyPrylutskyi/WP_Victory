@@ -705,9 +705,7 @@ if( !function_exists('victory_ajax_request') ) {
         }
 
         die();
-
     }
-
 }
 
 ?>

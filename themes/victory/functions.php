@@ -212,14 +212,6 @@ function add_slug_to_body_class($classes)
 }
 
 
-
-// Custom View Article link to Post
-function html5_blank_view_article($more)
-{
-    global $post;
-    return '... <a class="view-article" href="' . get_permalink($post->ID) . '">' . __('Read more', 'ledeffect') . '</a>';
-}
-
 // Remove Admin bar
 function remove_admin_bar()
 {
@@ -791,18 +783,6 @@ function change_post_object_label() {
     $labels->not_found_in_trash = 'Корзина пуста';
 }
 
-if( wp_doing_ajax() ){
-    add_action( 'wp_ajax_nopriv_victory_ajax_return_post', 'victory_ajax_return_post' );
-    add_action( 'wp_ajax_victory_ajax_return_post', 'victory_ajax_return_post' );
-}
-
-function victory_ajax_return_post() {
-    global $post;
-    $post = get_post($_POST['post'], OBJECT );
-    setup_postdata( $post );
-    //var_dump($post);
-}
-
 function logout_without_confirm($action, $result)
 {
     if ($action == "log-out" && !isset($_GET['_wpnonce'])) {
@@ -812,6 +792,57 @@ function logout_without_confirm($action, $result)
         die;
     }
 }
+
+/// Ajax Get News function
+
+add_action( 'wp_ajax_nopriv_victory_ajax_get_news', 'victory_ajax_get_news' );
+add_action( 'wp_ajax_victory_ajax_get_news', 'victory_ajax_get_news' );
+
+if( !function_exists('victory_ajax_get_news') ):
+    function victory_ajax_get_news(){
+        global $post;
+        $post_current = $_POST['post'];
+
+        $post = get_post($post_current);
+        setup_postdata( $post );
+
+        $new ='';
+
+        $new .='<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+        $new .='<img src="' . get_template_directory_uri() . '/img/close-modal.png" alt="close-modal">';
+        $new .='</button>';
+        $new .='<span class="data-news">' . get_the_date() . '</span>';
+        $new .='<div>';
+        $new .='<div class="all-w-bl-with">';
+        $new .='<div class="name">';
+        $new .='<p>';
+        $new .= get_the_title();
+        $new .= '</p>';
+        $new .='</div>';
+        $new .='<div class="img">';
+        if ( get_the_post_thumbnail_url() ) {
+            $new .='<img src="' . get_the_post_thumbnail_url() . '" alt="">';
+        }
+        $new .='</div>';
+        $new .='<div class="bot-has-row"><a href=""><span class="left"><i class="fas fa-chevron-left"></i></span></a><a href=""><span class="right"><i class="fas fa-chevron-right"></i></span></a></div>';
+        $new .='<div class="clean"></div>';
+        $new .='</div>';
+        $new .='<div class="text-info-has">';
+        $new .= get_the_content();
+        $new .='</div>';
+        $new .='</div>';
+
+        if(!empty($new)){
+            $json['success'] = 1;
+            $json['new'] = $new;
+        }else{
+            $json['success'] = 0;
+        }
+        echo json_encode($json);
+
+        die();
+    }
+endif; // end  victory_ajax_get_news
 
 /**
 

@@ -18,7 +18,7 @@ get_header();
                         <div class="have-img-back"></div>
                         <div class="ser-info-off">
                             <h4 class="one-serv-name">Грузчик</h4>
-                            <p class="price-of-our"><span>250</span> <i><img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></i>/час</p>
+                            <p class="price-of-our"><span>300</span> <i><img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></i>/час</p>
                             <div class="clean"></div>
                         </div>
                     </a>
@@ -38,7 +38,7 @@ get_header();
                         <div class="have-img-back"></div>
                         <div class="ser-info-off">
                             <h4 class="one-serv-name">Электрик</h4>
-                            <p class="price-of-our"><span>250</span> <i><img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></i>/час</p>
+                            <p class="price-of-our"><span>500</span> <i><img src="<?php echo get_template_directory_uri(); ?>/img/ruble1.png" alt="rb-sing"></i>/час</p>
                             <div class="clean"></div>
                         </div>
                     </a>

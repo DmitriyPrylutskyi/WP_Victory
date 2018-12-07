@@ -59,7 +59,7 @@ get_header();
                             echo '<li>Конфигурация: <span>' . $equipment_config .'</span></li>';
 
                         if (!empty($equipment_carrying))
-                            echo '<li>Грузоподъёмность: <span>' .$equipment_carrying . 'тонн</span></li>';
+                            echo '<li>Грузоподъёмность: <span>' .$equipment_carrying . ' тонн</span></li>';
 
                         if (!empty($equipment_volume))
                              echo '<li>Объём кузова: <span>' . $equipment_volume .' м3</span></li>';
