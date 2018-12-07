@@ -105,7 +105,7 @@ $rate_termless = get_option('termless_rate_options');
                                 <span class="value" id="total" form="calc">
                                     28500
                                 </span>
-                                <button type="submit" form="calc">Оставить заявку</button>
+                                <a href="" data-toggle="modal" data-target="#make-request" class="make-request">Оставить заявку</a>
                             </div>
                         </div>
                     </div>
@@ -182,6 +182,7 @@ $rate_termless = get_option('termless_rate_options');
                     </h4>
                     <p class="info">
                         Ответственность потребительского кооператива "Победа" перед своими клиентами застрахована в страховом обществе "Помощь" (лицензии СИ № 3834, СЛ № 3834, ПС № 3834) на сумму 100 миллионов рублей.
+                        <br><br><br><br>
                     </p>
                 </div>
                 <div class="one-bl-gar four">
@@ -196,9 +197,7 @@ $rate_termless = get_option('termless_rate_options');
             </div>
         </div>
         <div class="simple-text2">
-            <p>
-
-            </p>
+             <a href="" data-toggle="modal" data-target="#make-request" class="make-request">Оставить заявку</a>
         </div>
     </div>
 </div>

@@ -23,11 +23,11 @@ $phone = get_option('phone_options');
             </div>
             <div class="col-12 col-md-9 contacts">
                 <span>Email: </span>
-                <a href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a>
+                <a class="block" href="mailto:<?php echo $email; ?>"><?php echo $email; ?></a>
                 <span>Телефон горячей линии: </span>
-                <a href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a>
-                <span>ИНН: 7728439614 </span>
-                <span>ОГРН: 1187746738190</span>
+                <a class="block" href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a>
+                <span class="block">ИНН: 7728439614 </span>
+                <span class="block">ОГРН: 1187746738190</span>
             </div>
         </div>
     </div>
@@ -239,7 +239,7 @@ $phone = get_option('phone_options');
                         <span class="error-msg"></span>
                     </div>
                     <div class="input-grp">
-                        <input type="text" name="patronymic" id="patronymic" placeholder="Отчество" autocomplete="off" required>
+                        <input type="text" name="patronymic_name" id="patronymic" placeholder="Отчество" autocomplete="off" required>
                         <span class="error-msg"></span>
                     </div>
                     <div class="input-grp">
@@ -258,12 +258,12 @@ $phone = get_option('phone_options');
                         <input type="password" name="rpassword" id="rpassword" placeholder="Повторите пароль" autocomplete="off" required>
                         <span class="error-msg"></span>
                     </div>
-                    <div class="input-grp">
+                    <!-- <div class="input-grp">
                         <input type="checkbox" id="ireadd2" required>
                         <label for="ireadd2"><span></span>Я прочел и согласен с <a href="" data-toggle="modal"
                                 data-target="#leave-order" class="leave-order">Правилами и условиями</a></label>
                         <span class="error-msg"></span>
-                    </div>
+                    </div> -->
                     <input type="hidden" id="security-register" name="security-register" value="<?php echo create_onetime_nonce( 'register_nonce' ); ?>">
 
                     <input type="button" id="victory-login" value="Зарегистрироватся" class="reg-new-snb">
@@ -315,6 +315,32 @@ $phone = get_option('phone_options');
                     <textarea name="order-comment" id="order-comment" placeholder="Комментарий"></textarea>
                     <input type="hidden" id="security-order" name="security-order" value="<?php echo create_onetime_nonce( 'order_nonce' ); ?>">
                     <input type="button" id="victory-order" value="Отправить">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="make-request" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog other modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <img src="<?php echo get_template_directory_uri(); ?>/img/close-modal.png" alt="close-modal">
+                </button>
+                <form id="form-request">
+                    <div class="in-call-newsa">
+                        <h3>
+                            Напишите нам
+                        </h3>
+                        <div id="request_info_message"></div>
+                        <input type="text" name="requestor-name" id="requestor-name" placeholder="Имя">
+                        <input type="text" name="requestor-email" id="requestor-email" placeholder="E-mail">
+                        <input type="hidden" id="security-request" name="security-request" value="<?php echo create_onetime_nonce( 'request_nonce' ); ?>">
+                        <textarea name="requestor-comment" id="requestor-comment" placeholder="Комментарий"></textarea>
+                    </div>
+                    <input type="button" id="send-request" value="Отправить">
                 </form>
             </div>
         </div>

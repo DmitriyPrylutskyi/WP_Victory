@@ -38,7 +38,7 @@ get_header();
 
     ?>
     <div class="services-inner-wrapp">
-        <a href="<?php echo get_permalink( get_page_by_path( 'sevices', OBJECT ) ); ?>" class="back-to-allserv"><i class="fas fa-chevron-left"></i>Вернуться</a>
+        <a href="<?php echo get_permalink( get_page_by_path( 'services', OBJECT ) ); ?>" class="back-to-allserv"><i class="fas fa-chevron-left"></i>Вернуться</a>
         <h3 class="title-serv">Аренда спецтехники</h3>
         <div class="all-line-worr">
             <div class="left-w-sl">

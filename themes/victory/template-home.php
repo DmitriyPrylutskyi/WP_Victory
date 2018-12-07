@@ -224,7 +224,7 @@ wp_reset_query();
                         <span class="value" id="total" form="calc">
                                 28500
                             </span>
-                        <button type="submit" form="calc">Оставить заявку</button>
+                        <a href="" data-toggle="modal" data-target="#make-request" class="make-request">Оставить заявку</a>
                     </div>
                 </div>
             </div>

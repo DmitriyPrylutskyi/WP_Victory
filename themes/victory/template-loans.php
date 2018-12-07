@@ -40,7 +40,7 @@ $phone = get_option('phone_options');
         </div>
         <div class="clean"></div>
         <div class="text-info-only">
-
+            <a href="" data-toggle="modal" data-target="#make-request" class="make-request">Оставить заявку</a>
         </div>
     </div>
 </div>

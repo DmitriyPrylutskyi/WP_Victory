@@ -26,23 +26,18 @@ if( !function_exists('victory_ajax_register_form') ) {
 
         $user_name		= 	$last_name . ' ' . $first_name . ' ' . $patronymic;
 
-        if (preg_match("/^[0-9A-Za-z_]+$/", $last_name) == 0) {
+        if (preg_match("/^[^\d_,.!@#$%^&*()-\/*+=?~`\[\]\\<>]+$/", $last_name) == 0) {
             echo json_encode(array('register'=>false,'message'=>'Некорректное имя !', 'id'=>'last_name'));
             die();
         }
 
-        if (preg_match("/^[0-9A-Za-z_]+$/", $first_name) == 0) {
+        if (preg_match("/^[^\d_,.!@#$%^&*()-\/*+=?~`\[\]\\<>]+$/", $first_name) == 0) {
             echo json_encode(array('register'=>false,'message'=>'Некорректное имя !', 'id'=>'first_name'));
             die();
         }
 
-        if (preg_match("/^[0-9A-Za-z_]+$/", $patronymic) == 0) {
+        if (preg_match("/^[^\d_,.!@#$%^&*()-\/*+=?~`\[\]\\<>]+$/", $patronymic) == 0) {
             echo json_encode(array('register'=>false,'message'=>'Некорректное имя !', 'id'=>'patronymic'));
-            die();
-        }
-
-        if (preg_match("/^[\d- ]+$/", $phone) == 0) {
-            echo json_encode(array('register'=>false,'message'=>'Некорректный номер телефона !', 'id'=>'phone'));
             die();
         }
 
@@ -56,11 +51,6 @@ if( !function_exists('victory_ajax_register_form') ) {
             exit();
         }
 
-        if ($phone==''){
-            echo json_encode(array('register'=>false,'message'=>'Поле телефон пустое!', 'id'=>'phone'));
-            exit();
-        }
-
         if(filter_var($email,FILTER_VALIDATE_EMAIL) === false) {
             echo json_encode(array('register'=>false,'message'=>'Почта некорректная!', 'id'=>'email'));
             exit();
@@ -69,6 +59,16 @@ if( !function_exists('victory_ajax_register_form') ) {
         $domain = substr(strrchr($email, "@"), 1);
         if( !checkdnsrr ($domain) ){
             echo json_encode(array('register'=>false,'message'=>'Почта некорректная!', 'id'=>'email'));
+            exit();
+        }
+
+        if (preg_match("/^[\d- ]+$/", $phone) == 0) {
+            echo json_encode(array('register'=>false,'message'=>'Некорректный номер телефона !', 'id'=>'phone'));
+            die();
+        }
+
+        if ($phone==''){
+            echo json_encode(array('register'=>false,'message'=>'Поле телефон пустое!', 'id'=>'phone'));
             exit();
         }
 
@@ -87,17 +87,19 @@ if( !function_exists('victory_ajax_register_form') ) {
 
             $user_id = wp_create_user( $user_name, $password, $email );
 
+            //var_dump($user_id); die();
+
             update_user_meta($user_id, 'first_name', $first_name);
             update_user_meta($user_id, 'last_name', $last_name);
             update_user_meta($user_id, 'patronymic', $patronymic);
             update_user_meta($user_id, 'phone', $phone);
 
-            echo json_encode(array('register'=>true,'message'=>'Авторизация прошла успешно ...'));
+            echo json_encode(array('register'=>true,'message'=>'Регистрация прошла успешно ...'));
 
             exit();
 
         } else {
-            echo json_encode(array('register'=>false,'message'=>'Пользователь с таким номером уже существует. Пожалуйста используйте другой номер!', 'id'=>'email'));
+            echo json_encode(array('register'=>false,'message'=>'Пользователь с таким номером уже существует!', 'id'=>'phone'));
         }
         die();
 
@@ -188,7 +190,7 @@ if( !function_exists('victory_ajax_forgot_pass') ):
         $user_input = trim($forgot_email);
 
         $value          = 'Вы попросили сбросить пароль для следующей учетной записи:
-                            %website_url 
+                            %website_url
                             Имя: %username.
                             IЕсли это была ошибка, просто игнорируйте это письмо, и ничего не произойдет. Чтобы сбросить пароль, перейдите по следующему адресу: %reset_link,,
                             Спасибо!';
@@ -632,6 +634,75 @@ if( !function_exists('victory_ajax_add_order') ) {
         }
 
         wp_reset_query();
+
+        die();
+
+    }
+
+}
+
+/// Send Request function
+
+if( wp_doing_ajax() ){
+    add_action( 'wp_ajax_nopriv_victory_ajax_request', 'victory_ajax_request' );
+    add_action( 'wp_ajax_victory_ajax_request', 'victory_ajax_request' );
+}
+
+if( !function_exists('victory_ajax_request') ) {
+
+    function victory_ajax_request(){
+        $allowed_html   = array();
+
+        $requestor_name    =   trim( wp_kses ($_POST['requestor_name'],$allowed_html ));
+        $requestor_email   =   trim( wp_kses ($_POST['requestor_email'],$allowed_html ));
+        $requestor_comment =   trim( wp_kses ($_POST['requestor_comment'],$allowed_html ));
+
+        if( !verify_onetime_nonce($_POST['nonce'], 'request_nonce') ){
+            echo json_encode(array('register'=>false, 'message'=>'Что-то пошло не так. Повторите позже.'));
+            print ('Что-то пошло не так. Повторите позже.');
+            exit();
+        }
+
+        if ($requestor_name==''){
+            echo json_encode(array('request'=>false,'message'=>'Некорректное имя !', 'id'=>'requestor-name'));
+            exit();
+        }
+
+        if ($requestor_email==''){
+            echo json_encode(array('request'=>false,'message'=>'Некорректная почта !', 'id'=>'requestor-email'));
+            exit();
+        }
+
+        if(filter_var($requestor_email,FILTER_VALIDATE_EMAIL) === false) {
+            echo json_encode(array('request'=>false,'message'=>'Некорректная почта !', 'id'=>'requestor-email'));
+            exit();
+        }
+
+        $domain = substr(strrchr($requestor_email, "@"), 1);
+        if( !checkdnsrr ($domain) ){
+            echo json_encode(array('request'=>false,'message'=>'Некорректная почта !', 'id'=>'requestor-email'));
+            exit();
+        }
+
+        $website = get_site_url();
+        $subject = 'Отправлено с сайта ' . $website;
+
+        $message='';
+
+        $receiver_email = get_option('admin_email');
+
+        $message .= "Имя: " . $requestor_name . "\n\n ". "Email : " . $requestor_email . " \n\n " . "Сайт : " . $website . " \n\n " . "Тема : " . $subject . " \n\n" . "Комментарий: \n " . $requestor_comment;
+
+        $headers = 'From: No Reply <noreply@'.$_SERVER['HTTP_HOST'].'>' . "\r\n";
+
+        $mail = wp_mail($receiver_email, $subject, $message, $headers);
+
+
+        if( $mail ) {
+            echo json_encode(array('request'=>true,'message'=>'Сообщение отправлено', 'id'=>''));
+        } else {
+            echo json_encode(array('request'=>false,'message'=>'Повторите попытку позже', 'id'=>''));
+        }
 
         die();
 

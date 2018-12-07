@@ -42,7 +42,9 @@ $phone = get_option('phone_options');
                     <p>Победа</p>
                     <span>потребительский кооператив</span>
                 </a>
+
 				<?php victory_nav(); ?>
+
             </div>
         </div>
     </div>
@@ -64,15 +66,19 @@ $phone = get_option('phone_options');
 
 <?php
     if ( is_user_logged_in() ) {
+        $current_user           =   wp_get_current_user();
+        $userID                 =   $current_user->ID;
+        $foto                   =   get_the_author_meta( 'foto', $userID );
     ?>
         <script type="application/javascript">
-            $('.main-menu .login a').text('Выйти').attr('data-toggle', '').attr('data-target', '').attr('href', '<?php echo wp_logout_url(); ?>');
+            $('.main-menu .login').before('<li class="menu_item user-avatar"><a href="<?php echo get_permalink( get_page_by_path('personal-account', OBJECT ) ); ?>"><img src="<?php echo $foto; ?>" /></a></li>');
+            $('.main-menu .login a[title=" "]').text('Выйти').attr('data-toggle', '').attr('data-target', '').attr('href', '<?php echo wp_logout_url(); ?>');
         </script>
     <?php
     } else {
     ?>
         <script type="application/javascript">
-            $('.main-menu .login a').text('Войти').attr('data-toggle', 'modal').attr('data-target', '#enter').attr('href', '#');
+            $('.main-menu .login a[title=" "]').text('Войти').attr('data-toggle', 'modal').attr('data-target', '#enter').attr('href', '#');
         </script>
     <?php
     }

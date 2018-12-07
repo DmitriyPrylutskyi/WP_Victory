@@ -36,12 +36,12 @@ endif;
 
 
 function get_coords($address) {
-    echo '<script type="text/javascript" charset="utf-8" async="" src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU"></script>';
+    //echo '<script type="text/javascript" charset="utf-8" async="" src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU"></script>';
 
-    echo '<script type="application/javascript">
-            var geocoder = new YMaps.Geocoder("' . $address .'");
-            map.addOverlay(geocoder);
-           </script>';
+    //echo '<script type="application/javascript">
+    //        var geocoder = new YMaps.Geocoder("' . $address .'");
+    //        map.addOverlay(geocoder);
+    //       </script>';
 };
 
 ?>
@@ -71,16 +71,18 @@ function get_coords($address) {
                 </div>
             </div>
             <div class="right-send-mail">
-                <form>
+                <form id="form-request">
                     <div class="in-call-newsa">
                         <h3>
                             Напишите нам
                         </h3>
-                        <input type="text" placeholder="Имя">
-                        <input type="text" placeholder="E-mail">
-                        <textarea name="rew" id="rew" placeholder="Комментарий"></textarea>
+                        <div id="request_info_message"></div>
+                        <input type="text" name="requestor-name" id="requestor-name" placeholder="Имя">
+                        <input type="text" name="requestor-email" id="requestor-email" placeholder="E-mail">
+                        <input type="hidden" id="security-request" name="security-request" value="<?php echo create_onetime_nonce( 'request_nonce' ); ?>">
+                        <textarea name="requestor-comment" id="requestor-comment" placeholder="Комментарий"></textarea>
                     </div>
-                    <input type="submit" value="Отправить">
+                    <input type="button" id="send-request" value="Отправить">
                 </form>
             </div>
             <div class="clean"></div>
