@@ -658,8 +658,7 @@ if( !function_exists('victory_ajax_request') ) {
         $requestor_comment =   trim( wp_kses ($_POST['requestor_comment'],$allowed_html ));
 
         if( !verify_onetime_nonce($_POST['nonce'], 'request_nonce') ){
-            echo json_encode(array('register'=>false, 'message'=>'Что-то пошло не так. Повторите позже.'));
-            print ('Что-то пошло не так. Повторите позже.');
+            echo json_encode(array('request'=>false, 'message'=>'Что-то пошло не так. Повторите позже.'));
             exit();
         }
 

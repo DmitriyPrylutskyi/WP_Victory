@@ -7,18 +7,22 @@ $address = get_option('address_options');
 $email = get_option('email_options');
 $phone = get_option('phone_options');
 
+$file = get_field('file');
+$fileName = basename($file);
+
 if( have_rows('offices') ):
     while ( have_rows('offices') ) : the_row();
 
-        $office_name      = get_sub_field('office_name');
-        $office_address   = get_sub_field('office_address');
-        $office_phone     = get_sub_field('office_phone');
-        $office_email     = get_sub_field('office_email');
+        $office_name            = get_sub_field('office_name');
+        $office_address         = get_sub_field('office_address');
+        $office_phone           = get_sub_field('office_phone');
+        $office_email           = get_sub_field('office_email');
+        $office_coordinates     = get_sub_field('office_coordinates');
 
         $offices .= '<div class="one-line-contact">';
         $offices .= '<div class="left-line-cont">';
         $offices .= '<div class="block-with-map">';
-        $offices .= get_coords($office_name . ' ' . $office_address);
+        $offices .= do_shortcode('[yandexMap center="' . $office_coordinates .'" width="358" height="255" zoom_inital=17][yamap_label coord="' . $office_coordinates . '" icon="icon" icon_txt="ПК &quot; ПОБЕДА &quot;" iconcolor="#FF922D"][/yandexMap]');
         $offices .= '</div>';
         $offices .= '</div>';
         $offices .= '<div class="right-line-cont">';
@@ -33,16 +37,6 @@ if( have_rows('offices') ):
 
     endwhile;
 endif;
-
-
-function get_coords($address) {
-    //echo '<script type="text/javascript" charset="utf-8" async="" src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU"></script>';
-
-    //echo '<script type="application/javascript">
-    //        var geocoder = new YMaps.Geocoder("' . $address .'");
-    //        map.addOverlay(geocoder);
-    //       </script>';
-};
 
 ?>
 
@@ -86,6 +80,9 @@ function get_coords($address) {
                 </form>
             </div>
             <div class="clean"></div>
+            <div class="props">
+                <a href="<?php echo $file; ?>" download="<?php echo $fileName; ?>">Реквизиты - ПОБЕДА ПК</a>
+            </div>
         </div>
     </div>
 </div>
