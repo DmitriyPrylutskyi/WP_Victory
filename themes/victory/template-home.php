@@ -5,6 +5,10 @@ get_header();
 
 //section about
 $about_img = get_field('about_image');
+$about_description = get_field('about_description');
+$about_title = get_field('about_title');
+$advantages_title = get_field('advantages_title');
+$liders_title = get_field('liders_title');
 
 //section advantages
 $i = 1;
@@ -122,9 +126,7 @@ wp_reset_query();
         <div class="row">
             <div class="col-12">
                 <h1>
-                    В счастливое будущее
-                    <br>
-                    вместе с Победой
+                    <?php echo get_the_title(); ?>
                 </h1>
             </div>
         </div>
@@ -141,16 +143,14 @@ wp_reset_query();
             <div class="row">
                 <div class="col-12 offset">
                     <h2>
-                        потребительский кооператив,
-                        <br>
-                        которому доверяют тысячи россиян
+                        <?php echo $about_title; ?>
                     </h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12 col-md-6 offset">
                     <p>
-                        Потребительский кооператив "Победа" является открытой некоммерческой организацией, которая выполняет социальную миссию, предлагая населению и юридическим лицам доступные финасовые услуги. Без волокиты с бумагами и справками в «Победе» всегда можно сохранить свои сбережения под выгодные проценты или оформить займ. Ответственность ПК "Победа" перед своими клиентами застрахована в страховом обществе "Помощь".
+                        <?php echo $about_description; ?>
                     </p>
                 </div>
                 <div class="col-12 col-md-5 image">
@@ -165,7 +165,7 @@ wp_reset_query();
                 <div class="col-12">
                     <div class="advantages-wrapper">
                         <h2 class="title">
-                            Что мы знаем о победе?
+                            <?php echo $advantages_title; ?>
                         </h2>
                         <?php echo $advantages; ?>
                     </div>
@@ -178,7 +178,7 @@ wp_reset_query();
             <div class="row">
                 <div class="col-12 title">
                     <h3>
-                        Наши лидеры
+                        <?php echo $liders_title; ?>
                     </h3>
                 </div>
             </div>

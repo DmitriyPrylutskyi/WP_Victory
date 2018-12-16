@@ -10,19 +10,64 @@ $rate_12 = get_option('month_12_rate_options');
 $rate_24 = get_option('month_24_rate_options');
 $rate_termless = get_option('termless_rate_options');
 
+$saving_description = get_field('saving_description');
+$guarantees_title = get_field('guarantees_title');
+
+//guarantees
+$guarantees = '';
+$i = 1;
+
+if( have_rows('guarantees') ):
+    while ( have_rows('guarantees') ) : the_row();
+
+        $guarantee_title        = get_sub_field('guarantee_title');
+        $guarantee_description  = get_sub_field('guarantee_description');
+        $guarantee_image[$i]    = get_sub_field('guarantee_image');
+
+        if ( $i % 2 == 0) {
+            $guarantees .= '<div class="one-bl-gar right">';
+            $guarantees .= '<h4 class="title">';
+            $guarantees .= $guarantee_title;
+            $guarantees .= '</h4>';
+            $guarantees .= '<p class="info">';
+            $guarantees .= $guarantee_description;
+            $guarantees .= '</p>';
+            $guarantees .= '<div class="image" style="background-image: url(' . $guarantee_image[$i] . ');">';
+            $guarantees .= '</div>';
+            $guarantees .= '</div>';
+        } else {
+            $guarantees .= '<div class="one-bl-gar left">';
+            $guarantees .= '<h4 class="title">';
+            $guarantees .= $guarantee_title;
+            $guarantees .= '</h4>';
+            $guarantees .= '<p class="info">';
+            $guarantees .= $guarantee_description;
+            $guarantees .= '</p>';
+            $guarantees .= '<div class="image" style="background-image: url(' . $guarantee_image[$i] . ');">';
+            $guarantees .= '</div>';
+            $guarantees .= '</div>';
+        }
+
+        $i++;
+
+    endwhile;
+endif;
+
+?>
+
 ?>
 
 <div class="saving">
     <div class="oun-head no-ots">
-        <h2>Сбережения</h2>
+        <h2>
+            <?php echo get_the_title(); ?>
+        </h2>
     </div>
     <div class="saving-wrapp">
 
         <section class="calc">
             <div class="container">
-
                 <?php get_template_part('template-calc'); ?>
-
             </div>
         </section>
 
@@ -68,13 +113,15 @@ $rate_termless = get_option('termless_rate_options');
         </div>
         <div class="simple-text">
             <p>
-                Потребительский кооператив "Победа" является открытой некоммерческой организацией, которая выполняет социальную миссию, предлагая населению и юридическим лицам доступные финасовые услуги. Без волокиты с бумагами и справками в «Победе» всегда можно сохранить свои сбережения под выгодные проценты или оформить займ. Ответственность ПК "Победа" перед своими клиентами застрахована в страховом обществе "Помощь"
+                <?php echo $saving_description; ?>
             </p>
         </div>
         <div class="our-gar">
-            <h3>Наши гарантии</h3>
+            <h3>
+                <?php echo $guarantees_title; ?>
+            </h3>
             <div class="all-bl-gar">
-                <div class="one-bl-gar first">
+                <!-- <div class="one-bl-gar first">
                     <h4 class="title">
                         Собственный Резервный фонд
                     </h4>
@@ -106,7 +153,8 @@ $rate_termless = get_option('termless_rate_options');
                     <p class="info">
                         Максимальная честность перед клиентами и открытость ведения дел — одно из главных и непререкаемых правил работы «Победы». Стать членом Наблюдательного Совета и получать подробные ежеквартальные отчёты о деятельности организации может любой член кооператива, просто заявив о своём желании менеджерам офиса компании.
                     </p>
-                </div>
+                </div> -->
+               <?php echo $guarantees; ?>
                 <div class="clean"></div>
             </div>
         </div>

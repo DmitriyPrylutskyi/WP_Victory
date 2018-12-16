@@ -266,7 +266,7 @@ $phone = get_option('phone_options');
                     </div> -->
                     <input type="hidden" id="security-register" name="security-register" value="<?php echo create_onetime_nonce( 'register_nonce' ); ?>">
 
-                    <input type="button" id="victory-login" value="Зарегистрироватся" class="reg-new-snb">
+                    <input type="button" id="victory-login" value="Зарегистрироваться" class="reg-new-snb">
                 </form>
             </div>
         </div>

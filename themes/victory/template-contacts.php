@@ -22,7 +22,7 @@ if( have_rows('offices') ):
         $offices .= '<div class="one-line-contact">';
         $offices .= '<div class="left-line-cont">';
         $offices .= '<div class="block-with-map">';
-        $offices .= do_shortcode('[yandexMap center="' . $office_coordinates .'" width="358" height="255" zoom_inital=17][yamap_label coord="' . $office_coordinates . '" icon="icon" icon_txt="ПК &quot; ПОБЕДА &quot;" iconcolor="#FF922D"][/yandexMap]');
+        $offices .= do_shortcode('[yandexMap center="' . $office_coordinates .'" width="358" height="255" zoom_inital=17][yamap_label coord="' . $office_coordinates . '" icon="icon" icon_txt="ПК&quot;ПОБЕДА&quot;" iconcolor="#FF922D"][/yandexMap]');
         $offices .= '</div>';
         $offices .= '</div>';
         $offices .= '<div class="right-line-cont">';
@@ -42,7 +42,9 @@ endif;
 
 <div class="contacts-ar">
     <div class="oun-head">
-        <h2>КОНТАКТЫ</h2>
+        <h2>
+            <?php echo get_the_title(); ?>
+        </h2>
     </div>
     <div class="jjjjd">
         <div class="new-back">

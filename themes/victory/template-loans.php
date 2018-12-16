@@ -5,37 +5,40 @@ get_header();
 
 $phone = get_option('phone_options');
 
+//terms
+$terms = '';
+
+if( have_rows('terms') ):
+    while ( have_rows('terms') ) : the_row();
+
+    	$term = get_sub_field('term');
+
+    	if ( stristr($term, 'phone') ) {
+    		$term = str_replace("phone", "<a href='tel://$phone'>$phone</a>", $term);
+    	}
+
+    	$terms .= '<li>';
+    	$terms .= '<div>';
+    	$terms .= $term;
+    	$terms .= '</div>';
+    	$terms .= '</li>';
+
+    endwhile;
+endif;
+
 ?>
 
 <div class="loans-ar">
     <div class="oun-head">
-        <h2>Займы</h2>
+        <h2>
+            <?php echo get_the_title(); ?>
+        </h2>
     </div>
     <div class="loans-wrapp">
         <div class="block-with-back-or">
             <ol>
-                <li>
-                    <div>
-                        Потребительский кооператив «ПОБЕДА» выдаёт займы от 100 000 рублей юридическим и физическим лицам.
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        Процентная ставка по займу рассматривается в индивидуальном порядке и варьируется.
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        Займы выдаются только под обеспечение – поручительство либо залог, которым может быть как
-                        недвижимое, так и движимое имущество. Срок рассмотрения заявки – 3 рабочих дня.
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        Подать заявку на выдачу займа и получить всю необходимую дополнительную информацию можно в
-                        офисе кооператива либо по телефону <a href="tel://<?php echo $phone; ?>"><?php echo $phone; ?></a> (звонок бесплатный)
-                    </div>
-                </li>
+                <?php echo $terms; ?>
+                <div class="clean"></div>
             </ol>
         </div>
         <div class="clean"></div>
