@@ -20,6 +20,7 @@ get_header(); ?>
         </div>
     </div>
 </div>
+</div>
 
 <script>
 	$("body").addClass('less-foot');
